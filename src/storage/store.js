@@ -1804,6 +1804,28 @@ export const useMainStore = defineStore("useMainStore", {
     //   return isInside;
     // },
 
+    statusIconHTML(Status_of_support) {
+      let mhtml = "";
+      if (Status_of_support == "In Progress") {
+        mhtml = `
+            <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
+            `;
+      } else if (Status_of_support == "Completed") {
+        mhtml = `
+            <div class="shadow-sm w-3 h-3 bg-green-300"></div>
+            `;
+      } else {
+        mhtml = `
+            <b class="w-0 h-0
+              border-l-[6px] border-l-transparent
+              border-b-[12px] border-red-300
+              border-r-[6px] border-r-transparent">
+            </b>
+            `;
+      }
+      return mhtml;
+    },
+
     async onEachNationalMapFeature(feature, layer) {
       layer.on({
         mouseover: this.highlightNationalMapFeature,
@@ -1816,8 +1838,6 @@ export const useMainStore = defineStore("useMainStore", {
       let icon = L.divIcon({
         iconSize: null,
         iconAnchor: [25, 10],
-
-        // working... progress
         html: `<small class="ml-1 mr-1 bg-[#9298d467] font-mono font-thin" id="layer-name-label">
           ${
             feature.properties.state
@@ -1826,9 +1846,9 @@ export const useMainStore = defineStore("useMainStore", {
           }
         </small>`,
       });
-
-      this.natonalMapMarkers.addLayer(L.marker(bounds, { icon: icon }));
-      this.natonalMapMarkers.addTo(this.map);
+      L.marker(bounds, { icon: icon }).addTo(this.natonalMapMarkers);
+      // this.natonalMapMarkers.addLayer();
+      // this.natonalMapMarkers.addTo(this.map);
 
       let st = feature.properties.state;
       if (this.selectedState[this.view].includes(st)) {
@@ -1869,28 +1889,10 @@ export const useMainStore = defineStore("useMainStore", {
               }
             });
 
-            if (mpData.Status_of_support == "In Progress") {
-              mhtml = `
-            <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
-            `;
-            } else if (mpData.Status_of_support == "Completed") {
-              mhtml = `
-            <div class="shadow-sm w-3 h-3 bg-green-300"></div>
-            `;
-            } else {
-              mhtml = `
-            <b class="w-0 h-0
-              border-l-[6px] border-l-transparent
-              border-b-[12px] border-red-300
-              border-r-[6px] border-r-transparent">
-            </b>
-            `;
-            }
-
             let icon = L.divIcon({
               className: "facilities-marker",
               icData: mpData,
-              html: mhtml,
+              html: this.statusIconHTML(mpData.Status_of_support),
               popupAnchor: [0, 200],
             });
 
@@ -1900,28 +1902,6 @@ export const useMainStore = defineStore("useMainStore", {
           }
         }
       }
-    },
-
-    statusIconHTML(Status_of_support) {
-      let mhtml = "";
-      if (Status_of_support == "In Progress") {
-        mhtml = `
-            <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
-            `;
-      } else if (Status_of_support == "Completed") {
-        mhtml = `
-            <div class="shadow-sm w-3 h-3 bg-green-300"></div>
-            `;
-      } else {
-        mhtml = `
-            <b class="w-0 h-0
-              border-l-[6px] border-l-transparent
-              border-b-[12px] border-red-300
-              border-r-[6px] border-r-transparent">
-            </b>
-            `;
-      }
-      return mhtml;
     },
 
     async getRandLgaFacilities(state, lga, limit) {
@@ -2087,9 +2067,9 @@ export const useMainStore = defineStore("useMainStore", {
       // this.lgasMapMarkers.addTo(this.map);
       // this.lgaDotMarkers.addTo(this.map);
 
-      // if (this.lgaGeoJson) {
-      //   this.map.removeLayer(this.lgaGeoJson);
-      // }
+      if (this.lgaGeoJson) {
+        this.map.removeLayer(this.lgaGeoJson);
+      }
 
       this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
         style: this.layerStyle,
