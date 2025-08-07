@@ -903,7 +903,17 @@ export const useMainStore = defineStore("useMainStore", {
         features: [],
       };
 
-      this.lgas.forEach((d) => {
+      if (this.lgasMapMarkers) {
+        this.map.removeLayer(this.lgasMapMarkers);
+      }
+
+      this.lgasMapMarkers = L.layerGroup().addTo(this.map);
+
+      if (this.lgaGeoJson) {
+        this.map.removeLayer(this.lgaGeoJson);
+      }
+
+      this.lgas.forEach(async (d) => {
         // let geoCords = JSON.parse(d.geometry);
         this.mapGeoDataLga.features.push({
           type: "Feature",
@@ -914,9 +924,71 @@ export const useMainStore = defineStore("useMainStore", {
           },
           geometry: d.geometry,
         });
+
+        let st = d.state;
+        let lg = d.lga;
+
+        if (this.selectedState[this.view].includes(st)) {
+          // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+          let lgaFclts = await this.getRandLgaFacilities(
+            st,
+            lg,
+            this.mapLgaData[this.view].length
+          );
+
+          for (
+            let stIdx = 0;
+            stIdx < this.mapLgaData[this.view].length;
+            stIdx++
+          ) {
+            const mpData = this.mapLgaData[this.view][stIdx];
+            console.log("lgassp: ", mpData.LGA_supported);
+            if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
+              console.log("lgaMpData: ", mpData);
+              let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+              let randFacility = lgaFclts[randomIndex];
+
+              let cords = [
+                randFacility.geometry.coordinates[1],
+                randFacility.geometry.coordinates[0],
+              ];
+
+              let mhtml = "";
+
+              let icon = L.divIcon({
+                className: "facilities-marker",
+                icData: mpData,
+                html: this.statusIconHTML(mpData.Status_of_support),
+                popupAnchor: [0, 200],
+              });
+
+              L.marker(cords, {
+                icon: icon,
+                autoPan: true,
+                autoPanOnFocus: true,
+              })
+                .addTo(this.lgasMapMarkers)
+                .on("click", this.markerEventNational);
+            }
+          }
+        }
       });
 
-      await this.createLGAsMap();
+      let mapContainerParent = this.mapContainerRef.parentNode;
+      let mapContainer = this.mapContainerRef;
+
+      mapContainerParent.removeChild(this.mapContainerRef);
+      mapContainerParent.appendChild(mapContainer);
+
+      this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
+        style: this.layerStyle,
+        onEachFeature: this.onEachLGAsMapFeature,
+      }).addTo(this.map);
+
+      // this.fitBounds(this.geoJson);
+      let lgasBounds = this.lgaGeoJson.getBounds();
+      this.map.fitBounds(lgasBounds);
+      this.map.setMaxBounds(lgasBounds);
       this.isLaoding = false;
     },
 
@@ -1221,7 +1293,7 @@ export const useMainStore = defineStore("useMainStore", {
         features: [],
       };
 
-      this.states.forEach((d) => {
+      this.states.forEach(async (d) => {
         // let geoCords = JSON.parse(d.geometry);
         this.mapGeoData.features.push({
           type: "Feature",
@@ -1231,6 +1303,63 @@ export const useMainStore = defineStore("useMainStore", {
           },
           geometry: d.geometry,
         });
+
+        let st = d.state;
+        if (this.selectedState[this.view].includes(st)) {
+          // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+          let lgaFclts = await this.getRandStateFacilities(
+            st,
+            this.mapNationalData[this.view].length
+          );
+
+          for (
+            let stIdx = 0;
+            stIdx < this.mapNationalData[this.view].length;
+            stIdx++
+          ) {
+            const mpData = this.mapNationalData[this.view][stIdx];
+
+            if (
+              mpData.States_supported.some((stateObj) => stateObj.state === st)
+            ) {
+              let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+              let randFacility = lgaFclts[randomIndex];
+
+              let cords = [
+                randFacility.geometry.coordinates[1],
+                randFacility.geometry.coordinates[0],
+              ];
+
+              let mhtml = "";
+              mpData.Type_of_Support.forEach((tp) => {
+                let spt = this.supportTypes.find(
+                  (item) => item.name === tp.support_type
+                );
+                if (spt) {
+                  this.currentSupports[this.view][spt.name] = {
+                    bg: spt.bg,
+                    txt: spt.txt,
+                  };
+                }
+              });
+
+              let icon = L.divIcon({
+                className: "facilities-marker",
+                icData: mpData,
+                html: this.statusIconHTML(mpData.Status_of_support),
+                popupAnchor: [0, 200],
+              });
+
+              L.marker(cords, {
+                icon: icon,
+                autoPan: true,
+                autoPanOnFocus: true,
+              })
+                .addTo(this.natonalMapMarkers)
+                .on("click", this.markerEventNational);
+            }
+          }
+        }
       });
     },
 
@@ -1296,13 +1425,17 @@ export const useMainStore = defineStore("useMainStore", {
     closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
-
-      if (this.viewingMap) {
-        this.geoJson.resetStyle(this.viewingMap);
-      }
-
-      this.viewingMap = null;
-      this.map.flyToBounds(this.geoJson, { duration: 0.2 });
+      // if (this.viewingMap) {
+      //   this.geoJson.resetStyle(this.viewingMap);
+      // }
+      // if (this.lgasMapMarkers) {
+      //   this.map.removeLayer(this.lgasMapMarkers);
+      // }
+      // if (this.lgaGeoJson) {
+      //   this.map.removeLayer(this.lgaGeoJson);
+      // }
+      // this.viewingMap = null;
+      // this.map.flyToBounds(this.geoJson, { duration: 0.2 });
     },
 
     markerEvent(e) {
@@ -1850,58 +1983,58 @@ export const useMainStore = defineStore("useMainStore", {
       // this.natonalMapMarkers.addLayer();
       // this.natonalMapMarkers.addTo(this.map);
 
-      let st = feature.properties.state;
-      if (this.selectedState[this.view].includes(st)) {
-        // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
-        let lgaFclts = await this.getRandStateFacilities(
-          st,
-          this.mapNationalData[this.view].length
-        );
+      // let st = feature.properties.state;
+      // if (this.selectedState[this.view].includes(st)) {
+      //   // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+      //   let lgaFclts = await this.getRandStateFacilities(
+      //     st,
+      //     this.mapNationalData[this.view].length
+      //   );
 
-        for (
-          let stIdx = 0;
-          stIdx < this.mapNationalData[this.view].length;
-          stIdx++
-        ) {
-          const mpData = this.mapNationalData[this.view][stIdx];
+      //   for (
+      //     let stIdx = 0;
+      //     stIdx < this.mapNationalData[this.view].length;
+      //     stIdx++
+      //   ) {
+      //     const mpData = this.mapNationalData[this.view][stIdx];
 
-          if (
-            mpData.States_supported.some((stateObj) => stateObj.state === st)
-          ) {
-            let randomIndex = Math.floor(Math.random() * lgaFclts.length);
-            let randFacility = lgaFclts[randomIndex];
+      //     if (
+      //       mpData.States_supported.some((stateObj) => stateObj.state === st)
+      //     ) {
+      //       let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+      //       let randFacility = lgaFclts[randomIndex];
 
-            let cords = [
-              randFacility.geometry.coordinates[1],
-              randFacility.geometry.coordinates[0],
-            ];
+      //       let cords = [
+      //         randFacility.geometry.coordinates[1],
+      //         randFacility.geometry.coordinates[0],
+      //       ];
 
-            let mhtml = "";
-            mpData.Type_of_Support.forEach((tp) => {
-              let spt = this.supportTypes.find(
-                (item) => item.name === tp.support_type
-              );
-              if (spt) {
-                this.currentSupports[this.view][spt.name] = {
-                  bg: spt.bg,
-                  txt: spt.txt,
-                };
-              }
-            });
+      //       let mhtml = "";
+      //       mpData.Type_of_Support.forEach((tp) => {
+      //         let spt = this.supportTypes.find(
+      //           (item) => item.name === tp.support_type
+      //         );
+      //         if (spt) {
+      //           this.currentSupports[this.view][spt.name] = {
+      //             bg: spt.bg,
+      //             txt: spt.txt,
+      //           };
+      //         }
+      //       });
 
-            let icon = L.divIcon({
-              className: "facilities-marker",
-              icData: mpData,
-              html: this.statusIconHTML(mpData.Status_of_support),
-              popupAnchor: [0, 200],
-            });
+      //       let icon = L.divIcon({
+      //         className: "facilities-marker",
+      //         icData: mpData,
+      //         html: this.statusIconHTML(mpData.Status_of_support),
+      //         popupAnchor: [0, 200],
+      //       });
 
-            L.marker(cords, { icon: icon, autoPan: true, autoPanOnFocus: true })
-              .addTo(this.natonalMapMarkers)
-              .on("click", this.markerEventNational);
-          }
-        }
-      }
+      //       L.marker(cords, { icon: icon, autoPan: true, autoPanOnFocus: true })
+      //         .addTo(this.natonalMapMarkers)
+      //         .on("click", this.markerEventNational);
+      //     }
+      //   }
+      // }
     },
 
     async getRandLgaFacilities(state, lga, limit) {
@@ -1941,56 +2074,53 @@ export const useMainStore = defineStore("useMainStore", {
 
       L.marker(bounds, { icon: icon }).addTo(this.lgasMapMarkers);
 
-      // this.lgasMapMarkers.addLayer(L.marker(bounds, { icon: icon }));
-      // this.lgasMapMarkers.addTo(this.map);
+      // let st = feature.properties.state;
+      // let lg = feature.properties.lga;
 
-      let st = feature.properties.state;
-      let lg = feature.properties.lga;
+      // if (this.selectedState[this.view].includes(st)) {
+      //   // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+      //   let lgaFclts = await this.getRandLgaFacilities(
+      //     st,
+      //     lg,
+      //     this.mapLgaData[this.view].length
+      //   );
 
-      if (this.selectedState[this.view].includes(st)) {
-        // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
-        let lgaFclts = await this.getRandLgaFacilities(
-          st,
-          lg,
-          this.mapLgaData[this.view].length
-        );
+      //   for (
+      //     let stIdx = 0;
+      //     stIdx < this.mapLgaData[this.view].length;
+      //     stIdx++
+      //   ) {
+      //     const mpData = this.mapLgaData[this.view][stIdx];
+      //     console.log("lgassp: ", mpData.LGA_supported);
+      //     if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
+      //       console.log("lgaMpData: ", mpData);
+      //       let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+      //       let randFacility = lgaFclts[randomIndex];
 
-        for (
-          let stIdx = 0;
-          stIdx < this.mapLgaData[this.view].length;
-          stIdx++
-        ) {
-          const mpData = this.mapLgaData[this.view][stIdx];
-          console.log("lgassp: ", mpData.LGA_supported);
-          if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
-            console.log("lgaMpData: ", mpData);
-            let randomIndex = Math.floor(Math.random() * lgaFclts.length);
-            let randFacility = lgaFclts[randomIndex];
+      //       let cords = [
+      //         randFacility.geometry.coordinates[1],
+      //         randFacility.geometry.coordinates[0],
+      //       ];
 
-            let cords = [
-              randFacility.geometry.coordinates[1],
-              randFacility.geometry.coordinates[0],
-            ];
+      //       let mhtml = "";
 
-            let mhtml = "";
+      //       let icon = L.divIcon({
+      //         className: "facilities-marker",
+      //         icData: mpData,
+      //         html: this.statusIconHTML(mpData.Status_of_support),
+      //         popupAnchor: [0, 200],
+      //       });
 
-            let icon = L.divIcon({
-              className: "facilities-marker",
-              icData: mpData,
-              html: this.statusIconHTML(mpData.Status_of_support),
-              popupAnchor: [0, 200],
-            });
-
-            L.marker(cords, {
-              icon: icon,
-              autoPan: true,
-              autoPanOnFocus: true,
-            })
-              .addTo(this.lgasMapMarkers)
-              .on("click", this.markerEventNational);
-          }
-        }
-      }
+      //       L.marker(cords, {
+      //         icon: icon,
+      //         autoPan: true,
+      //         autoPanOnFocus: true,
+      //       })
+      //         .addTo(this.lgasMapMarkers)
+      //         .on("click", this.markerEventNational);
+      //     }
+      //   }
+      // }
     },
 
     createNationalMap() {
@@ -2025,62 +2155,61 @@ export const useMainStore = defineStore("useMainStore", {
       this.map.setMaxBounds(this.geoJson.getBounds());
     },
 
-    createLGAsMap() {
-      var mapContainerParent = this.mapContainerRef.parentNode;
-      var mapContainer = this.mapContainerRef;
+    // createLGAsMap() {
+    //   var mapContainerParent = this.mapContainerRef.parentNode;
+    //   var mapContainer = this.mapContainerRef;
 
-      mapContainerParent.removeChild(this.mapContainerRef);
-      mapContainerParent.appendChild(mapContainer);
+    //   mapContainerParent.removeChild(this.mapContainerRef);
+    //   mapContainerParent.appendChild(mapContainer);
 
-      // this.currentSupports[this.view] = {};
+    //   // this.currentSupports[this.view] = {};
 
-      // if (this.map) {
-      //   this.map.remove();
-      //   mapContainer.innerHTML = "";
-      // }
-      // this.map = L.map(mapContainer, {
-      //   zoomSnap: 0.2,
-      // });
+    //   // if (this.map) {
+    //   //   this.map.remove();
+    //   //   mapContainer.innerHTML = "";
+    //   // }
+    //   // this.map = L.map(mapContainer, {
+    //   //   zoomSnap: 0.2,
+    //   // });
 
-      // this.map.scrollWheelZoom.disable();
-      // this.map.keyboard.disable();
-      // this.mapInfo.update = this.mapInfoOnUpdate;
-      // this.natonalMapMarkers = L.layerGroup();
+    //   // this.map.scrollWheelZoom.disable();
+    //   // this.map.keyboard.disable();
+    //   // this.mapInfo.update = this.mapInfoOnUpdate;
+    //   // this.natonalMapMarkers = L.layerGroup();
 
-      if (this.lgasMapMarkers) {
-        // this.lgasMapMarkers.clearLayers();
-        this.map.removeLayer(this.lgasMapMarkers);
-      }
+    //   // if (this.lgasMapMarkers) {
+    //   //   this.map.removeLayer(this.lgasMapMarkers);
+    //   // }
 
-      // if (this.lgaDotMarkers) {
-      //   this.map.removeLayer(this.lgaDotMarkers);
-      // }
+    //   // // if (this.lgaDotMarkers) {
+    //   // //   this.map.removeLayer(this.lgaDotMarkers);
+    //   // // }
 
-      // if (this.natonalMapMarkers) {
-      //   // this.natonalMapMarkers.clearLayers();
-      //   this.map.removeLayer(this.natonalMapMarkers);
-      // }
+    //   // // if (this.natonalMapMarkers) {
+    //   // //   // this.natonalMapMarkers.clearLayers();
+    //   // //   this.map.removeLayer(this.natonalMapMarkers);
+    //   // // }
 
-      this.lgasMapMarkers = L.layerGroup().addTo(this.map);
-      // this.lgaDotMarkers = L.layerGroup();
+    //   // this.lgasMapMarkers = L.layerGroup().addTo(this.map);
+    //   // // this.lgaDotMarkers = L.layerGroup();
 
-      // this.lgasMapMarkers.addTo(this.map);
-      // this.lgaDotMarkers.addTo(this.map);
+    //   // // this.lgasMapMarkers.addTo(this.map);
+    //   // // this.lgaDotMarkers.addTo(this.map);
 
-      if (this.lgaGeoJson) {
-        this.map.removeLayer(this.lgaGeoJson);
-      }
+    //   // if (this.lgaGeoJson) {
+    //   //   this.map.removeLayer(this.lgaGeoJson);
+    //   // }
 
-      this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
-        style: this.layerStyle,
-        onEachFeature: this.onEachLGAsMapFeature,
-      }).addTo(this.map);
+    //   this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
+    //     style: this.layerStyle,
+    //     onEachFeature: this.onEachLGAsMapFeature,
+    //   }).addTo(this.map);
 
-      // this.fitBounds(this.geoJson);
-      let lgasBounds = this.lgaGeoJson.getBounds();
-      this.map.fitBounds(lgasBounds);
-      this.map.setMaxBounds(lgasBounds);
-    },
+    //   // this.fitBounds(this.geoJson);
+    //   let lgasBounds = this.lgaGeoJson.getBounds();
+    //   this.map.fitBounds(lgasBounds);
+    //   this.map.setMaxBounds(lgasBounds);
+    // },
 
     // createLGAsMap() {
     //   var mapLgaContainerParent = this.mapContainerLGARef.parentNode;
