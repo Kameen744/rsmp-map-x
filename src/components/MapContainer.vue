@@ -3,7 +3,6 @@
     <div
       ref="mapContainerRef"
       class="min-h-[80vh] max-h-[80vh] overflow-hidden"
-      :class="markerSelected() ? 'mr-[300px]' : ''"
     >
     </div>
     <div class="absolute top-[10px] left-[80px] z-[991] bg-transparent">
