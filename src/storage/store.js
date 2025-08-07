@@ -27,6 +27,7 @@ export const useMainStore = defineStore("useMainStore", {
     supportTypes: null,
     currentSupports: {},
     viewingMap: null,
+    viewingLgaMap: null,
     cso: "all",
     mapData: {},
     mapNationalData: {},
@@ -1098,34 +1099,34 @@ export const useMainStore = defineStore("useMainStore", {
       this.mapInfo.update(layer.feature.properties);
     },
 
-    highlightMapFeature(e) {
-      if (this.viewingMap) {
-        return;
-      }
-      var layer = e.target;
-      // layer.openPopup();
-      // layer.bindTooltip()
-      var tlt = tooltip().setContent(`
-        <div class="bg-blue-600 text-white text-lg font-bold m-0 p-0 px-2">
-        ${e.target.feature.properties.LGA}
-        </div>
-      `);
-      layer.bindTooltip(tlt);
-      layer.openTooltip();
+    // highlightMapFeature(e) {
+    //   if (this.viewingMap) {
+    //     return;
+    //   }
+    //   var layer = e.target;
+    //   // layer.openPopup();
+    //   // layer.bindTooltip()
+    //   var tlt = tooltip().setContent(`
+    //     <div class="bg-blue-600 text-white text-lg font-bold m-0 p-0 px-2">
+    //     ${e.target.feature.properties.LGA}
+    //     </div>
+    //   `);
+    //   layer.bindTooltip(tlt);
+    //   layer.openTooltip();
 
-      layer.setStyle({
-        weight: 1,
-        color: "#98A94A",
-        dashArray: "",
-        fillOpacity: 0.8,
-      });
+    //   layer.setStyle({
+    //     weight: 1,
+    //     color: "#98A94A",
+    //     dashArray: "",
+    //     fillOpacity: 0.8,
+    //   });
 
-      L.DomUtil.setOpacity(e.target._path, 0.5);
-      this.fadeInColor(e.target._path);
-      layer.bringToFront();
+    //   L.DomUtil.setOpacity(e.target._path, 0.5);
+    //   this.fadeInColor(e.target._path);
+    //   layer.bringToFront();
 
-      this.mapInfo.update(layer.feature.properties);
-    },
+    //   this.mapInfo.update(layer.feature.properties);
+    // },
 
     fitBounds(geo) {
       // this.map.setView(geo.getBounds().getCenter(), this.mapFit);
@@ -1958,7 +1959,9 @@ export const useMainStore = defineStore("useMainStore", {
         </small>`,
       });
 
-      this.lgasMapMarkers.addLayer(L.marker(bounds, { icon: icon }));
+      L.marker(bounds, { icon: icon }).addTo(this.lgasMapMarkers);
+
+      // this.lgasMapMarkers.addLayer(L.marker(bounds, { icon: icon }));
       // this.lgasMapMarkers.addTo(this.map);
 
       let st = feature.properties.state;
