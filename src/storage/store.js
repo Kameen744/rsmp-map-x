@@ -906,7 +906,7 @@ export const useMainStore = defineStore("useMainStore", {
       if (this.lgasMapMarkers) {
         this.map.removeLayer(this.lgasMapMarkers);
       }
-
+      this.map.removeLayer(this.natonalMapMarkers);
       this.lgasMapMarkers = L.layerGroup().addTo(this.map);
 
       if (this.lgaGeoJson) {
@@ -1363,25 +1363,25 @@ export const useMainStore = defineStore("useMainStore", {
       });
     },
 
-    async loadMapGeometry(data) {
-      this.mapGeoData = {
-        type: "FeatureCollection",
-        features: [],
-      };
+    // async loadMapGeometry(data) {
+    //   this.mapGeoData = {
+    //     type: "FeatureCollection",
+    //     features: [],
+    //   };
 
-      data.forEach((d) => {
-        let geoCords = JSON.parse(d.geometry);
-        this.mapGeoData.features.push({
-          type: "Feature",
-          id: d.lga,
-          properties: {
-            state: d.state,
-            LGA: d.lga,
-          },
-          geometry: geoCords,
-        });
-      });
-    },
+    //   data.forEach((d) => {
+    //     let geoCords = JSON.parse(d.geometry);
+    //     this.mapGeoData.features.push({
+    //       type: "Feature",
+    //       id: d.lga,
+    //       properties: {
+    //         state: d.state,
+    //         LGA: d.lga,
+    //       },
+    //       geometry: geoCords,
+    //     });
+    //   });
+    // },
 
     // generatePoints(mapGeometry, numPoints) {
     //   // Parse the GeoJSON polygon data
@@ -1422,9 +1422,15 @@ export const useMainStore = defineStore("useMainStore", {
     //   return points;
     // },
 
-    closePopup() {
+    async closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
+      if (this.mapType == "lgas") {
+        this.launchAapp();
+        // this.loadNationalMapGeometry();
+        // await this.createNationalMap();
+      }
+
       // if (this.viewingMap) {
       //   this.geoJson.resetStyle(this.viewingMap);
       // }
