@@ -1426,7 +1426,11 @@ export const useMainStore = defineStore("useMainStore", {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
       if (this.mapType == "lgas") {
-        this.launchAapp();
+        this.selectedState[this.view].length = 0;
+        this.states.forEach((s) => {
+          this.selectedState[this.view].push(s.state);
+        });
+        this.updateApp();
         // this.loadNationalMapGeometry();
         // await this.createNationalMap();
       }
