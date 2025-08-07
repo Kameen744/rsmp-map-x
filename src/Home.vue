@@ -12,6 +12,7 @@
         v-if="view == 'chart'"
       ></StatusContainer>
       <MapContainer v-show="view == 'map'"></MapContainer>
+      <!-- <TestMap v-show="view == 'map'"></TestMap> -->
       <!-- <MapContainerLga
         v-show="view == 'map' && mapType == 'lgas'"
       ></MapContainerLga> -->
@@ -34,6 +35,7 @@ import PartnerContainer from "./components/PartnerContainer.vue";
 import CsoContainer from "./components/CsoContainer.vue";
 import PartnerInsContainer from "./components/PartnerInsContainer.vue";
 import MapContainerLga from "./components/MapContainerLga.vue";
+import TestMap from "./components/TestMap.vue";
 
 const store = useMainStore();
 const ready = ref(false);

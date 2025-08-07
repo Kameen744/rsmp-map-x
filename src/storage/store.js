@@ -30,6 +30,7 @@ export const useMainStore = defineStore("useMainStore", {
     cso: "all",
     mapData: {},
     mapNationalData: {},
+    mapLgaData: {},
     chartData: null,
     partnerSummaryData: {},
     chartMainContainerRef: null,
@@ -59,7 +60,7 @@ export const useMainStore = defineStore("useMainStore", {
     lgasMapMarkers: null,
     mapMarkers: null,
     layerNamePopup: null,
-    lgaMapMarker: null,
+    lgaDotMarkers: null,
     mapInfoProps: null,
     mapLegend: L.control({ position: "bottomright" }),
     selectedMarker: null,
@@ -774,6 +775,22 @@ export const useMainStore = defineStore("useMainStore", {
       });
     },
 
+    async fetchLgaMapData() {
+      let filter = {
+        state: toRaw(this.selectedState[this.view]),
+        lga: toRaw(this.selectedLga[this.view]),
+        partner: toRaw(this.selectedPartners[this.view]),
+        supportFocus: toRaw(this.selectedPrograms[this.view]),
+        suportType: toRaw(this.selectedSupports[this.view]),
+        status: toRaw(this.selectedStatus[this.view]),
+      };
+
+      await axios.post(`${pbUrl}/api/support/lgas`, filter).then((res) => {
+        this.mapLgaData[this.view] = null;
+        this.mapLgaData[this.view] = res.data;
+      });
+    },
+
     // async fetchMapData() {
     //   await axios
     //     .get("https://pb-api.resourcetrackr.com/api/support")
@@ -872,7 +889,13 @@ export const useMainStore = defineStore("useMainStore", {
       this.isLaoding = true;
       this.mapType = "lgas";
       await this.fetchLgas();
-      await this.fetchNationalMapData();
+
+      this.selectedLga[this.view].length = 0;
+      this.lgas.forEach((l) => {
+        this.selectedLga[this.view].push(l.lga);
+      });
+
+      await this.fetchLgaMapData();
       // this.loadNationalMapGeometry();
       this.mapGeoDataLga = {
         type: "FeatureCollection",
@@ -1144,8 +1167,8 @@ export const useMainStore = defineStore("useMainStore", {
       //   this.selectedLgaMarker = dataSet;
       // }
 
-      // let layer = e.target;
-      // this.viewingMap = layer;
+      let layer = e.target;
+      this.viewingMap = layer;
       // layer.setStyle({
       //   weight: 1,
       //   color: "red",
@@ -1272,9 +1295,11 @@ export const useMainStore = defineStore("useMainStore", {
     closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
+
       if (this.viewingMap) {
         this.geoJson.resetStyle(this.viewingMap);
       }
+
       this.viewingMap = null;
       this.map.flyToBounds(this.geoJson, { duration: 0.2 });
     },
@@ -1285,8 +1310,9 @@ export const useMainStore = defineStore("useMainStore", {
     },
 
     markerEventNational(e) {
-      this.selectedLgaMarker = null;
+      // this.selectedLgaMarker = null;
       this.selectedMarker = e.target.options.icon.options.icData;
+      // console.log(this.selectedMarker);
     },
 
     // async createNationalDataPoints() {
@@ -1868,7 +1894,7 @@ export const useMainStore = defineStore("useMainStore", {
             });
 
             L.marker(cords, { icon: icon, autoPan: true, autoPanOnFocus: true })
-              .addTo(this.map)
+              .addTo(this.natonalMapMarkers)
               .on("click", this.markerEventNational);
           }
         }
@@ -1897,6 +1923,23 @@ export const useMainStore = defineStore("useMainStore", {
       return mhtml;
     },
 
+    async getRandLgaFacilities(state, lga, limit) {
+      const recName = `${state}-${lga}-${limit}`;
+      let fcs = await this.getLoc(recName);
+      if (fcs) {
+        return fcs;
+      } else {
+        let filt = { state: state, lga: lga, limit: limit };
+        await axios
+          .post(`${pbUrl}/api/rand/lga/facilities`, filt)
+          .then(async (r) => {
+            await this.setLoc(recName, r.data);
+          });
+        fcs = await this.getLoc(recName);
+        return fcs;
+      }
+    },
+
     async onEachLGAsMapFeature(feature, layer) {
       layer.on({
         mouseover: this.highlightNationalMapFeature,
@@ -1916,27 +1959,28 @@ export const useMainStore = defineStore("useMainStore", {
       });
 
       this.lgasMapMarkers.addLayer(L.marker(bounds, { icon: icon }));
-      this.lgasMapMarkers.addTo(this.map);
+      // this.lgasMapMarkers.addTo(this.map);
 
       let st = feature.properties.state;
       let lg = feature.properties.lga;
+
       if (this.selectedState[this.view].includes(st)) {
         // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
-        let lgaFclts = await this.getRandStateFacilities(
+        let lgaFclts = await this.getRandLgaFacilities(
           st,
-          this.mapNationalData[this.view].length
+          lg,
+          this.mapLgaData[this.view].length
         );
 
         for (
           let stIdx = 0;
-          stIdx < this.mapNationalData[this.view].length;
+          stIdx < this.mapLgaData[this.view].length;
           stIdx++
         ) {
-          const mpData = this.mapNationalData[this.view][stIdx];
-          // console.log("lgaMpData: ", mpData);
-          if (
-            mpData.States_supported.some((stateObj) => stateObj.state === st)
-          ) {
+          const mpData = this.mapLgaData[this.view][stIdx];
+          console.log("lgassp: ", mpData.LGA_supported);
+          if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
+            console.log("lgaMpData: ", mpData);
             let randomIndex = Math.floor(Math.random() * lgaFclts.length);
             let randFacility = lgaFclts[randomIndex];
 
@@ -1947,36 +1991,6 @@ export const useMainStore = defineStore("useMainStore", {
 
             let mhtml = "";
 
-            // mpData.Type_of_Support.forEach((tp) => {
-            //   let spt = this.supportTypes.find(
-            //     (item) => item.name === tp.support_type
-            //   );
-            //   if (spt) {
-            //     this.currentSupports[this.view][spt.name] = {
-            //       bg: spt.bg,
-            //       txt: spt.txt,
-            //     };
-            //   }
-            // });
-
-            // if (mpData.Status_of_support == "In Progress") {
-            //   mhtml = `
-            // <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
-            // `;
-            // } else if (mpData.Status_of_support == "Completed") {
-            //   mhtml = `
-            // <div class="shadow-sm w-3 h-3 bg-green-300"></div>
-            // `;
-            // } else {
-            //   mhtml = `
-            // <b class="w-0 h-0
-            //   border-l-[6px] border-l-transparent
-            //   border-b-[12px] border-red-300
-            //   border-r-[6px] border-r-transparent">
-            // </b>
-            // `;
-            // }
-
             let icon = L.divIcon({
               className: "facilities-marker",
               icData: mpData,
@@ -1984,8 +1998,12 @@ export const useMainStore = defineStore("useMainStore", {
               popupAnchor: [0, 200],
             });
 
-            L.marker(cords, { icon: icon, autoPan: true, autoPanOnFocus: true })
-              .addTo(this.map)
+            L.marker(cords, {
+              icon: icon,
+              autoPan: true,
+              autoPanOnFocus: true,
+            })
+              .addTo(this.lgasMapMarkers)
               .on("click", this.markerEventNational);
           }
         }
@@ -2013,7 +2031,7 @@ export const useMainStore = defineStore("useMainStore", {
       this.map.scrollWheelZoom.disable();
       this.map.keyboard.disable();
       this.mapInfo.update = this.mapInfoOnUpdate;
-      this.natonalMapMarkers = L.layerGroup();
+      this.natonalMapMarkers = L.layerGroup().addTo(this.map);
 
       this.geoJson = L.geoJson(this.mapGeoData, {
         style: this.layerStyle,
@@ -2051,7 +2069,20 @@ export const useMainStore = defineStore("useMainStore", {
         this.map.removeLayer(this.lgasMapMarkers);
       }
 
-      this.lgasMapMarkers = L.layerGroup();
+      // if (this.lgaDotMarkers) {
+      //   this.map.removeLayer(this.lgaDotMarkers);
+      // }
+
+      // if (this.natonalMapMarkers) {
+      //   // this.natonalMapMarkers.clearLayers();
+      //   this.map.removeLayer(this.natonalMapMarkers);
+      // }
+
+      this.lgasMapMarkers = L.layerGroup().addTo(this.map);
+      // this.lgaDotMarkers = L.layerGroup();
+
+      // this.lgasMapMarkers.addTo(this.map);
+      // this.lgaDotMarkers.addTo(this.map);
 
       // if (this.lgaGeoJson) {
       //   this.map.removeLayer(this.lgaGeoJson);
