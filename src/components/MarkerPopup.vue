@@ -133,6 +133,17 @@
           </div>
         </div>
 
+        <div>
+          <h2 class="text-xl font-semibold mb-2">LGA's Supported</h2>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="lga in selectedMarker.LGA_supported"
+              class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded"
+              >{{ lga.lga }}</span
+            >
+          </div>
+        </div>
+
         <!-- Thematic Areas -->
         <div>
           <h2 class="text-xl font-semibold mb-4">Thematic Areas Supported</h2>
