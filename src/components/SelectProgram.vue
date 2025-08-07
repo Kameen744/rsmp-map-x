@@ -11,17 +11,14 @@
         class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg py-1 rounded-md border-2 border-rsmp-sec min-w-36"
       >
         <div class="inline-flex max-w-28 overflow-hidden">
-          <div class="text-nowrap" v-if="selectedPrograms[view].length <= 0">
+          <div v-if="selectedPrograms[view].length <= 0" class="text-nowrap">
             Campaign Focus
           </div>
-          <div
-            v-else
-            class="text-nowrap"
-            v-for="program in selectedPrograms[view].slice(-2)"
-          >
-            {{ program }}
+          <div v-else class="text-nowrap">
+            {{ selectedPrograms[view].length }} Selected
           </div>
         </div>
+
         <b
           class="ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900"
         >
@@ -30,10 +27,10 @@
       </div>
       <ul
         tabindex="0"
-        class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec"
+        class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-md max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec"
       >
         <li
-          class="rounded-none border-b-2 border-blue-50"
+          class="rounded-md border-b-2 border-blue-50"
           v-for="program in programAreas"
           :class="
             store.selected(selectedPrograms[view], program.service)
@@ -44,11 +41,11 @@
           <a
             href=""
             @click.prevent="SelectProgram(program)"
-            class="hover:rounded-none text-lg inline-flex justify-between"
+            class="hover:rounded-md text-lg inline-flex justify-between"
           >
             <span>{{ program.service }}</span>
             <b
-              class="w-8 h-8 rounded-full pr-1 bg-blue-200 text-center text-xs text-blue-900"
+              class="w-8 h-8 rounded-full pr-1 text-center text-xs text-blue-900"
             >
               <CheckIcon
                 v-if="selectedPrograms[view].includes(program.service)"
@@ -90,7 +87,7 @@ const SelectProgram = (program) => {
       (item) => item !== program.service
     );
   }
-  console.log(selectedPrograms.value[view.value]);
-  // store.updateApp();
+  // console.log(selectedPrograms.value[view.value]);
+  store.updateApp();
 };
 </script>

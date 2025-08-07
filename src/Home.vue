@@ -12,6 +12,9 @@
         v-if="view == 'chart'"
       ></StatusContainer>
       <MapContainer v-show="view == 'map'"></MapContainer>
+      <!-- <MapContainerLga
+        v-show="view == 'map' && mapType == 'lgas'"
+      ></MapContainerLga> -->
       <PartnerContainer v-if="view == 'chart'"></PartnerContainer>
       <CsoContainer v-if="view == 'cso'"></CsoContainer>
       <PartnerInsContainer v-if="view == 'ptins'"></PartnerInsContainer>
@@ -30,6 +33,7 @@ import MapContainer from "./components/MapContainer.vue";
 import PartnerContainer from "./components/PartnerContainer.vue";
 import CsoContainer from "./components/CsoContainer.vue";
 import PartnerInsContainer from "./components/PartnerInsContainer.vue";
+import MapContainerLga from "./components/MapContainerLga.vue";
 
 const store = useMainStore();
 const ready = ref(false);
@@ -44,6 +48,7 @@ const {
   chartCleanedData,
   view,
   selectedStatus,
+  mapType,
 } = storeToRefs(store);
 
 onMounted(() => {
@@ -52,7 +57,7 @@ onMounted(() => {
   selectedState.value[view.value] = [];
   selectedLga.value[view.value] = [];
   selectedPrograms.value[view.value] = [];
-  selectedPartners.value[view.value] = [];
+  selectedPartners.value[view.value] = ["AFENET", "McKinsey", "UNICEF", "WHO"];
   selectedSupports.value[view.value] = [];
   selectedStatus.value[view.value] = ["In Progress"];
   // selectedStatus.value[view.value] = ["Ongoing"];

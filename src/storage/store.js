@@ -13,8 +13,10 @@ export const useMainStore = defineStore("useMainStore", {
   state: () => ({
     isLaoding: false,
     view: "map",
-    state: "national",
+    lgaNameIcon: null,
+    mapType: "states",
     map: null,
+    lgaMap: null,
     mapFit: 8,
     states: null,
     lgas: null,
@@ -36,21 +38,25 @@ export const useMainStore = defineStore("useMainStore", {
     chartDataKeys: null,
     chartCleanedData: [],
     mapGeoData: {},
+    mapGeoDataLga: {},
     // baseUrl: 'https://resourcemapping.sydani.org/api/method/resourcemapping.data',
     baseUrl:
       "https://demo-resourcemapping-85.9.203.7.nip.io/api/method/resourcemapping.data",
     apiMethod: "",
-    mapContainerRefMain: null,
+    // mapContainerRefMain: null,
     mapContainerRef: null,
+    mapContainerLGARef: null,
     // mapKeyRef: null,
     // mapKeyContentRef: null,
     geoJson: null,
+    lgaGeoJson: null,
     markerGeoJson: null,
     today: new Date(),
     mapTLayer: "",
     mapPointerHTML: "",
     mapInfo: L.control(),
     natonalMapMarkers: null,
+    lgasMapMarkers: null,
     mapMarkers: null,
     layerNamePopup: null,
     lgaMapMarker: null,
@@ -586,6 +592,7 @@ export const useMainStore = defineStore("useMainStore", {
       // this.delLoc("states");
 
       let states = await this.getLoc("states");
+      // console.log(states);
       if (states) {
         this.states = states;
       } else {
@@ -601,27 +608,29 @@ export const useMainStore = defineStore("useMainStore", {
         //   this.isLaoding = false;
         // });
       }
+
+      this.states.forEach((s) => {
+        this.selectedState[this.view].push(s.state);
+      });
     },
 
     async fetchLgas() {
       let state = this.selectedState[this.view][0];
       let recName = `${state}-lgas`;
-      // let url = `lgas?state=${this.selectedState[this.view][0]}`;
+      this.delLoc(recName);
       let lgs = await this.getLoc(recName);
+
       if (lgs) {
         this.lgas = lgs;
       } else {
-        const records = await pb.collection("lga").getFullList({
-          fields: "state,lga,geometry",
-          filter: `state='${state}'`,
-        });
-        await this.setLoc(recName, records);
-        this.lgas = records;
-        // await this.fetch(url).then(async (res) => {
-        //   this.lgas = await res.data.lgas;
-        //   await this.setLoc(url, this.lgas);
-        //   this.isLaoding = false;
-        // });
+        await axios
+          .post(`${pbUrl}/api/state/lgas`, {
+            states: this.selectedState[this.view],
+          })
+          .then(async (res) => {
+            await this.setLoc(recName, res.data);
+            this.lgas = res.data;
+          });
       }
     },
 
@@ -681,6 +690,11 @@ export const useMainStore = defineStore("useMainStore", {
         { partner: "USCDC", short_name: "USCDC", cso_partner: 0 },
         { partner: "WHO", short_name: "WHO", cso_partner: 0 },
       ];
+
+      // this.partners.forEach((p) => {
+      //   this.selectedPartners[this.view].push(p.partner);
+      // });
+
       // this.isLaoding = true;
       // await this.delLoc("partners");
       // let partners = await this.getLoc("partners");
@@ -723,6 +737,10 @@ export const useMainStore = defineStore("useMainStore", {
         { service: "Nutrition" },
         { service: "Routine Immunization" },
       ];
+
+      // this.programAreas.forEach((p) => {
+      //   this.selectedPrograms[this.view].push(p.service);
+      // });
       // if (!this.programAreas) {
       //   await this.fetch("programs").then(async (res) => {
       //     this.programAreas = res.data.programs;
@@ -738,26 +756,9 @@ export const useMainStore = defineStore("useMainStore", {
         { name: "Funding", bg: "#29CD42", txt: "#bf7245" },
         { name: "Provision of Commodities", bg: "#107510", txt: "#f5dfe9" },
       ];
-
-      // if (!this.supportTypes) {
-      //   await this.fetch("support_types").then(async (res) => {
-      //     this.supportTypes = res.data.support_types;
-      //     console.log(this.supportTypes);
-      //     this.isLaoding = false;
-      //   });
-      // }
     },
 
     async fetchNationalMapData() {
-      // let filter = {
-      //   state: ["Fct"],
-      //   lga: ["Bwari"],
-      //   partner: ["CHAI"],
-      //   supportFocus: ["Polio"],
-      //   suportType: ["Technical Support"],
-      //   status: ["In Progress"],
-      // };
-
       let filter = {
         state: toRaw(this.selectedState[this.view]),
         lga: toRaw(this.selectedLga[this.view]),
@@ -766,76 +767,11 @@ export const useMainStore = defineStore("useMainStore", {
         suportType: toRaw(this.selectedSupports[this.view]),
         status: toRaw(this.selectedStatus[this.view]),
       };
-      console.log(filter);
+
       await axios.post(`${pbUrl}/api/support`, filter).then((res) => {
         this.mapNationalData[this.view] = null;
         this.mapNationalData[this.view] = res.data;
       });
-
-      // let url = `support_duration?`;
-      // let partners_param = "&partners=";
-      // let programs_param = "&program_area=";
-      // let support_param = "&support_types=";
-      // let status_param = "&support_status=";
-
-      // let pts = this.selectedPartners[this.view];
-      // let prgs = this.selectedPrograms[this.view];
-      // let spts = this.selectedSupports[this.view];
-      // let stts = this.selectedStatus[this.view];
-
-      // pts.forEach((part) => {
-      //   partners_param += `${part},`;
-      // });
-
-      // prgs.forEach((prg) => {
-      //   programs_param += `${prg},`;
-      // });
-
-      // spts.forEach((sp) => {
-      //   support_param += `${sp},`;
-      // });
-
-      // stts.forEach((st) => {
-      //   status_param += `${st},`;
-      // });
-
-      // let st = this.selectedState[this.view];
-      // let lg = this.selectedLga[this.view];
-
-      // if (this.view == "chart") {
-      //   url = `support_coverage?`;
-      // }
-
-      // url += `state=${st}`;
-
-      // if (lg) {
-      //   url += `&lga=${lg}`;
-      // }
-
-      // if (this.selectedPrograms[this.view]) {
-      //   url += programs_param;
-      // }
-      // if (this.selectedPartners[this.view]) {
-      //   url += partners_param;
-      // }
-      // if (this.selectedSupports[this.view]) {
-      //   url += support_param;
-      // }
-      // if (this.selectedStatus[this.view]) {
-      //   url += status_param;
-      // }
-
-      // url += `&cso=${this.cso}`;
-
-      // await this.fetch(url)
-      //   .then(async (res) => {
-      //     this.mapNationalData[this.view] = null;
-      //     this.mapNationalData[this.view] = res.data;
-      //     this.isLaoding = false;
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
     },
 
     // async fetchMapData() {
@@ -914,6 +850,7 @@ export const useMainStore = defineStore("useMainStore", {
     async launchAapp() {
       this.isLaoding = true;
       await this.fetchStates();
+
       // await this.fetchLgas();
       await this.fetchPartners();
       await this.fetchPrograms();
@@ -931,65 +868,94 @@ export const useMainStore = defineStore("useMainStore", {
       this.isLaoding = false;
     },
 
+    async launchAappLga() {
+      this.isLaoding = true;
+      this.mapType = "lgas";
+      await this.fetchLgas();
+      await this.fetchNationalMapData();
+      // this.loadNationalMapGeometry();
+      this.mapGeoDataLga = {
+        type: "FeatureCollection",
+        features: [],
+      };
+
+      this.lgas.forEach((d) => {
+        // let geoCords = JSON.parse(d.geometry);
+        this.mapGeoDataLga.features.push({
+          type: "Feature",
+          id: `${d.state}-${d.lga}`,
+          properties: {
+            state: d.state,
+            lga: d.lga,
+          },
+          geometry: d.geometry,
+        });
+      });
+
+      await this.createLGAsMap();
+      this.isLaoding = false;
+    },
+
     async updateApp() {
       // await this.fetchMapData();
       if (this.view == "map") {
         // await this.mapMarkers.clearLayers();
         // await this.markerGeoJson.clearLayers();
         // await this.geoJson.clearLayers();
-        if (this.state == "national") {
-          await this.fetchNationalMapData();
-          await this.loadNationalMapGeometry();
-          this.map.remove();
-          this.mapContainerRef.innerHTML = "";
-          // await this.createMap();
-          await this.createNationalMap();
-        } else {
-          await this.fetchMapData();
-          await this.loadGeoData();
-          await this.createMap();
-        }
+        // if (this.mapType == "states") {
+
+        await this.fetchNationalMapData();
+        await this.loadNationalMapGeometry();
+        // await this.createMap();
+        await this.createNationalMap();
+        // } else {
+        //   await this.fetchMapData();
+        //   await this.loadGeoData();
+        //   await this.createMap();
+        // }
         // await this.geoJson.addData(this.mapGeoData);
         // await this.createDataPoints();
-      } else if (this.view == "chart") {
-        // this.selectedPrograms = null;
-        this.chartDataKeys = Object.keys(this.mapData[this.view]["data"]);
-        this.chartDataKeys = this.chartDataKeys.sort();
-        // console.log(this.chartDataKeys);
-        this.chartCleanedData = [];
-        this.initChart();
-      } else if (this.view == "ptins") {
-        const that = this;
-        let partnerSummaryData = {};
-        const insData = this.mapData[this.view]["data"];
-
-        Object.keys(insData).forEach((st) => {
-          Object.keys(insData[st]).forEach((lg) => {
-            insData[st][lg].forEach((progData) => {
-              let prgArea = progData.program_area;
-              let partner = progData.partner;
-
-              if (!partnerSummaryData[prgArea]) {
-                partnerSummaryData[prgArea] = {};
-              }
-
-              if (!partnerSummaryData[prgArea][partner]) {
-                partnerSummaryData[prgArea][partner] = [];
-              }
-
-              let hasSupport = partnerSummaryData[prgArea][partner].some(
-                (obj) => obj.type_of_support === progData.type_of_support
-              );
-
-              if (!hasSupport) {
-                partnerSummaryData[prgArea][partner].push(progData);
-              }
-            });
-          });
-        });
-
-        that.partnerSummaryData = partnerSummaryData;
       }
+
+      // else if (this.view == "chart") {
+      //   // this.selectedPrograms = null;
+      //   this.chartDataKeys = Object.keys(this.mapData[this.view]["data"]);
+      //   this.chartDataKeys = this.chartDataKeys.sort();
+      //   // console.log(this.chartDataKeys);
+      //   this.chartCleanedData = [];
+      //   this.initChart();
+      // } else if (this.view == "ptins") {
+      //   const that = this;
+      //   let partnerSummaryData = {};
+      //   const insData = this.mapData[this.view]["data"];
+
+      //   Object.keys(insData).forEach((st) => {
+      //     Object.keys(insData[st]).forEach((lg) => {
+      //       insData[st][lg].forEach((progData) => {
+      //         let prgArea = progData.program_area;
+      //         let partner = progData.partner;
+
+      //         if (!partnerSummaryData[prgArea]) {
+      //           partnerSummaryData[prgArea] = {};
+      //         }
+
+      //         if (!partnerSummaryData[prgArea][partner]) {
+      //           partnerSummaryData[prgArea][partner] = [];
+      //         }
+
+      //         let hasSupport = partnerSummaryData[prgArea][partner].some(
+      //           (obj) => obj.type_of_support === progData.type_of_support
+      //         );
+
+      //         if (!hasSupport) {
+      //           partnerSummaryData[prgArea][partner].push(progData);
+      //         }
+      //       });
+      //     });
+      //   });
+
+      //   that.partnerSummaryData = partnerSummaryData;
+      // }
 
       this.isLaoding = false;
     },
@@ -1168,14 +1134,16 @@ export const useMainStore = defineStore("useMainStore", {
     },
 
     async zoomToMapFeatureNational(e) {
-      // let dataSet = e.target.feature.properties;
+      let dataSet = e.target.feature.properties;
       // let mpd = this.mapNationalData[this.view];
+
       // this.selectedMarker = null;
+
       // if (this.selectedState) {
-      //   // dataSet["supports"] = mpd.data[dataSet.state][dataSet.LGA];
       //   dataSet["supports"] = mpd.data[dataSet.state];
       //   this.selectedLgaMarker = dataSet;
       // }
+
       // let layer = e.target;
       // this.viewingMap = layer;
       // layer.setStyle({
@@ -1184,7 +1152,12 @@ export const useMainStore = defineStore("useMainStore", {
       //   dashArray: "",
       //   fillOpacity: 0.8,
       // });
-      // this.map.flyToBounds(e.target,   { duration: 0.2 }, 24);
+      // console.log(dataSet);
+      this.selectedState[this.view].length = 0;
+      this.selectedState[this.view].push(dataSet.state);
+      // console.log(this.selectedState[this.view]);
+      this.launchAappLga();
+      // this.map.flyToBounds(e.target, { duration: 0.2 }, 24);
     },
 
     mapInfoOnUpdate(props) {
@@ -1225,9 +1198,6 @@ export const useMainStore = defineStore("useMainStore", {
       };
 
       this.states.forEach((d) => {
-        // console.log(d);
-        // console.log(d.state);
-        // console.log(d.geometry);
         // let geoCords = JSON.parse(d.geometry);
         this.mapGeoData.features.push({
           type: "Feature",
@@ -1704,108 +1674,108 @@ export const useMainStore = defineStore("useMainStore", {
       }
     },
 
-    async checkNigerianGeo(point) {
-      const geoJsonPolygon = {
-        type: "Polygon",
-        coordinates: [
-          [
-            [8.500288, 4.771983],
-            [7.462108, 4.412108],
-            [7.082596, 4.464689],
-            [6.698072, 4.240594],
-            [5.898173, 4.262453],
-            [5.362805, 4.887971],
-            [5.033574, 5.611802],
-            [4.325607, 6.270651],
-            [3.57418, 6.2583],
-            [2.691702, 6.258817],
-            [2.749063, 7.870734],
-            [2.723793, 8.506845],
-            [2.912308, 9.137608],
-            [3.220352, 9.444153],
-            [3.705438, 10.06321],
-            [3.60007, 10.332186],
-            [3.797112, 10.734746],
-            [3.572216, 11.327939],
-            [3.61118, 11.660167],
-            [3.680634, 12.552903],
-            [3.967283, 12.956109],
-            [4.107946, 13.531216],
-            [4.368344, 13.747482],
-            [5.443058, 13.865924],
-            [6.445426, 13.492768],
-            [6.820442, 13.115091],
-            [7.330747, 13.098038],
-            [7.804671, 13.343527],
-            [9.014933, 12.826659],
-            [9.524928, 12.851102],
-            [10.114814, 13.277252],
-            [10.701032, 13.246918],
-            [10.989593, 13.387323],
-            [11.527803, 13.32898],
-            [12.302071, 13.037189],
-            [13.083987, 13.596147],
-            [13.318702, 13.556356],
-            [13.995353, 12.461565],
-            [14.181336, 12.483657],
-            [14.577178, 12.085361],
-            [14.468192, 11.904752],
-            [14.415379, 11.572369],
-            [13.57295, 10.798566],
-            [13.308676, 10.160362],
-            [13.1676, 9.640626],
-            [12.955468, 9.417772],
-            [12.753672, 8.717763],
-            [12.218872, 8.305824],
-            [12.063946, 7.799808],
-            [11.839309, 7.397042],
-            [11.745774, 6.981383],
-            [11.058788, 6.644427],
-            [10.497375, 7.055358],
-            [10.118277, 7.03877],
-            [9.522706, 6.453482],
-            [9.233163, 6.444491],
-            [8.757533, 5.479666],
-            [8.500288, 4.771983],
-          ],
-        ],
-      };
+    // async checkNigerianGeo(point) {
+    //   const geoJsonPolygon = {
+    //     type: "Polygon",
+    //     coordinates: [
+    //       [
+    //         [8.500288, 4.771983],
+    //         [7.462108, 4.412108],
+    //         [7.082596, 4.464689],
+    //         [6.698072, 4.240594],
+    //         [5.898173, 4.262453],
+    //         [5.362805, 4.887971],
+    //         [5.033574, 5.611802],
+    //         [4.325607, 6.270651],
+    //         [3.57418, 6.2583],
+    //         [2.691702, 6.258817],
+    //         [2.749063, 7.870734],
+    //         [2.723793, 8.506845],
+    //         [2.912308, 9.137608],
+    //         [3.220352, 9.444153],
+    //         [3.705438, 10.06321],
+    //         [3.60007, 10.332186],
+    //         [3.797112, 10.734746],
+    //         [3.572216, 11.327939],
+    //         [3.61118, 11.660167],
+    //         [3.680634, 12.552903],
+    //         [3.967283, 12.956109],
+    //         [4.107946, 13.531216],
+    //         [4.368344, 13.747482],
+    //         [5.443058, 13.865924],
+    //         [6.445426, 13.492768],
+    //         [6.820442, 13.115091],
+    //         [7.330747, 13.098038],
+    //         [7.804671, 13.343527],
+    //         [9.014933, 12.826659],
+    //         [9.524928, 12.851102],
+    //         [10.114814, 13.277252],
+    //         [10.701032, 13.246918],
+    //         [10.989593, 13.387323],
+    //         [11.527803, 13.32898],
+    //         [12.302071, 13.037189],
+    //         [13.083987, 13.596147],
+    //         [13.318702, 13.556356],
+    //         [13.995353, 12.461565],
+    //         [14.181336, 12.483657],
+    //         [14.577178, 12.085361],
+    //         [14.468192, 11.904752],
+    //         [14.415379, 11.572369],
+    //         [13.57295, 10.798566],
+    //         [13.308676, 10.160362],
+    //         [13.1676, 9.640626],
+    //         [12.955468, 9.417772],
+    //         [12.753672, 8.717763],
+    //         [12.218872, 8.305824],
+    //         [12.063946, 7.799808],
+    //         [11.839309, 7.397042],
+    //         [11.745774, 6.981383],
+    //         [11.058788, 6.644427],
+    //         [10.497375, 7.055358],
+    //         [10.118277, 7.03877],
+    //         [9.522706, 6.453482],
+    //         [9.233163, 6.444491],
+    //         [8.757533, 5.479666],
+    //         [8.500288, 4.771983],
+    //       ],
+    //     ],
+    //   };
 
-      // Ensure the input is a valid polygon
-      if (
-        !geoJsonPolygon ||
-        geoJsonPolygon.type !== "Polygon" ||
-        !geoJsonPolygon.coordinates ||
-        geoJsonPolygon.coordinates.length === 0
-      ) {
-        console.error("Invalid GeoJSON Polygon object provided.");
-        return false;
-      }
+    //   // Ensure the input is a valid polygon
+    //   if (
+    //     !geoJsonPolygon ||
+    //     geoJsonPolygon.type !== "Polygon" ||
+    //     !geoJsonPolygon.coordinates ||
+    //     geoJsonPolygon.coordinates.length === 0
+    //   ) {
+    //     console.error("Invalid GeoJSON Polygon object provided.");
+    //     return false;
+    //   }
 
-      const x = point[0]; // longitude
-      const y = point[1]; // latitude
+    //   const x = point[0]; // longitude
+    //   const y = point[1]; // latitude
 
-      // The exterior ring of the polygon
-      const vs = geoJsonPolygon.coordinates[0];
+    //   // The exterior ring of the polygon
+    //   const vs = geoJsonPolygon.coordinates[0];
 
-      let isInside = false;
-      for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        const xi = vs[i][0],
-          yi = vs[i][1];
-        const xj = vs[j][0],
-          yj = vs[j][1];
+    //   let isInside = false;
+    //   for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+    //     const xi = vs[i][0],
+    //       yi = vs[i][1];
+    //     const xj = vs[j][0],
+    //       yj = vs[j][1];
 
-        // Check if the horizontal ray from the point intersects with the edge (i, j)
-        const intersect =
-          yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+    //     // Check if the horizontal ray from the point intersects with the edge (i, j)
+    //     const intersect =
+    //       yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
 
-        if (intersect) {
-          isInside = !isInside;
-        }
-      }
+    //     if (intersect) {
+    //       isInside = !isInside;
+    //     }
+    //   }
 
-      return isInside;
-    },
+    //   return isInside;
+    // },
 
     async onEachNationalMapFeature(feature, layer) {
       layer.on({
@@ -1834,149 +1804,192 @@ export const useMainStore = defineStore("useMainStore", {
       this.natonalMapMarkers.addTo(this.map);
 
       let st = feature.properties.state;
-      // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
-      let lgaFclts = await this.getRandStateFacilities(
-        st,
-        this.mapNationalData[this.view].length
-      );
+      if (this.selectedState[this.view].includes(st)) {
+        // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+        let lgaFclts = await this.getRandStateFacilities(
+          st,
+          this.mapNationalData[this.view].length
+        );
 
-      for (
-        let stIdx = 0;
-        stIdx < this.mapNationalData[this.view].length;
-        stIdx++
-      ) {
-        const mpData = this.mapNationalData[this.view][stIdx];
+        for (
+          let stIdx = 0;
+          stIdx < this.mapNationalData[this.view].length;
+          stIdx++
+        ) {
+          const mpData = this.mapNationalData[this.view][stIdx];
 
-        if (mpData.States_supported.some((stateObj) => stateObj.state === st)) {
-          let randomIndex = Math.floor(Math.random() * lgaFclts.length);
-          let randFacility = lgaFclts[randomIndex];
+          if (
+            mpData.States_supported.some((stateObj) => stateObj.state === st)
+          ) {
+            let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+            let randFacility = lgaFclts[randomIndex];
 
-          let randGeo = randFacility.geometry;
-          // let cords = randGeo.coordinates.reverse();
-          let cords = [randGeo.coordinates[1], randGeo.coordinates[0]];
-          // console.log(cords);
-          // const result = await this.checkNigerianGeo(cords);
+            let cords = [
+              randFacility.geometry.coordinates[1],
+              randFacility.geometry.coordinates[0],
+            ];
 
-          let mhtml = "";
-          mpData.Type_of_Support.forEach((tp) => {
-            let spt = this.supportTypes.find(
-              (item) => item.name === tp.support_type
-            );
-            if (spt) {
-              this.currentSupports[this.view][spt.name] = {
-                bg: spt.bg,
-                txt: spt.txt,
-              };
-            }
-          });
+            let mhtml = "";
+            mpData.Type_of_Support.forEach((tp) => {
+              let spt = this.supportTypes.find(
+                (item) => item.name === tp.support_type
+              );
+              if (spt) {
+                this.currentSupports[this.view][spt.name] = {
+                  bg: spt.bg,
+                  txt: spt.txt,
+                };
+              }
+            });
 
-          if (mpData.Status_of_support == "In Progress") {
-            mhtml = `
+            if (mpData.Status_of_support == "In Progress") {
+              mhtml = `
             <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
             `;
-          } else if (mpData.Status_of_support == "Completed") {
-            mhtml = `
+            } else if (mpData.Status_of_support == "Completed") {
+              mhtml = `
             <div class="shadow-sm w-3 h-3 bg-green-300"></div>
             `;
-          } else {
-            mhtml = `
+            } else {
+              mhtml = `
             <b class="w-0 h-0
               border-l-[6px] border-l-transparent
               border-b-[12px] border-red-300
               border-r-[6px] border-r-transparent">
             </b>
             `;
+            }
+
+            let icon = L.divIcon({
+              className: "facilities-marker",
+              icData: mpData,
+              html: mhtml,
+              popupAnchor: [0, 200],
+            });
+
+            L.marker(cords, { icon: icon, autoPan: true, autoPanOnFocus: true })
+              .addTo(this.map)
+              .on("click", this.markerEventNational);
           }
-
-          let icon = L.divIcon({
-            className: "facilities-marker",
-            icData: mpData,
-            html: mhtml,
-            popupAnchor: [0, 200],
-          });
-
-          L.marker(cords, { icon: icon, autoPan: true, autoPanOnFocus: true })
-            .addTo(this.map)
-            .on("click", this.markerEventNational);
         }
       }
+    },
 
-      // this.filterByState(this.mapNationalData[this.view], st).forEach((rec) => {
-      //   console.log(rec);
-      // });
-      // console.log();
-      // if (this.mapNationalData[this.view].data[st]) {
-      //   mpDt = this.mapNationalData[this.view].data[st];
-      // }
+    statusIconHTML(Status_of_support) {
+      let mhtml = "";
+      if (Status_of_support == "In Progress") {
+        mhtml = `
+            <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
+            `;
+      } else if (Status_of_support == "Completed") {
+        mhtml = `
+            <div class="shadow-sm w-3 h-3 bg-green-300"></div>
+            `;
+      } else {
+        mhtml = `
+            <b class="w-0 h-0
+              border-l-[6px] border-l-transparent
+              border-b-[12px] border-red-300
+              border-r-[6px] border-r-transparent">
+            </b>
+            `;
+      }
+      return mhtml;
+    },
 
-      // for (const lg in mpDt) {
-      //   let lgObj = mpDt[lg];
-      //   console.log(lgObj);
-      //   if (lgObj) {
-      //     let lgaFclts = this.facilities.filter((fc) => fc.lga === lg);
+    async onEachLGAsMapFeature(feature, layer) {
+      layer.on({
+        mouseover: this.highlightNationalMapFeature,
+        mouseout: this.resetMapHighlight,
+        // click: this.zoomToMapFeatureNational,
+      });
 
-      //     let fcLen = lgaFclts.length;
-      //     lgObj.forEach((d) => {
-      //       let randomIndex = Math.floor(Math.random() * fcLen);
-      //       let randFacility = lgaFclts[randomIndex];
+      let bounds = layer.getBounds().getCenter();
 
-      //       let randGeo = randFacility.geometry;
-      //       let cords = randGeo.coordinates.reverse();
-      //       let mhtml = "";
-      //       let bg = d.type_of_support_bg;
+      let icon = L.divIcon({
+        iconSize: null,
+        iconAnchor: [25, 10],
 
-      //       this.currentSupports[this.view][d.type_of_support] = {
-      //         bg: bg,
-      //         txt: d.type_of_support_txt,
-      //       };
+        html: `<small class="ml-1 mr-1 bg-[#9298d467] font-mono font-thin" id="layer-name-label">
+          ${feature.properties.lga}
+        </small>`,
+      });
 
-      //       if (d.status == "Ongoing") {
-      //         mhtml = `
-      //       <div class="shadow-sm w-3 h-3 rounded-full" style="background: ${bg};"></div>
-      //       `;
-      //       } else if (d.status == "Completed") {
-      //         mhtml = `
-      //       <div class="shadow-sm w-3 h-3" style="background: ${bg};"></div>
-      //       `;
-      //       } else {
-      //         mhtml = `
-      //       <b class="w-0 h-0
-      //         border-l-[10px] border-l-transparent
-      //         border-b-[15px] border-b-[${bg}]
-      //         border-r-[10px] border-r-transparent">
-      //       </b>
-      //       `;
-      //       }
+      this.lgasMapMarkers.addLayer(L.marker(bounds, { icon: icon }));
+      this.lgasMapMarkers.addTo(this.map);
 
-      //       let iconData = {
-      //         state: st,
-      //         lga: lg,
-      //         type_of_support: d.type_of_support,
-      //         partner: d.partner,
-      //         program_area: d.program_area,
-      //         status: d.status,
-      //         start_date: d.start_date,
-      //         end_date: d.end_date,
-      //         number_of_personnel_deployed: d.number_of_personnel_deployed,
-      //         toolsmaterials_provided: d.toolsmaterials_provided,
-      //         funder: d.funder,
-      //         summary_of_support: d.summary_of_support,
-      //       };
+      let st = feature.properties.state;
+      let lg = feature.properties.lga;
+      if (this.selectedState[this.view].includes(st)) {
+        // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+        let lgaFclts = await this.getRandStateFacilities(
+          st,
+          this.mapNationalData[this.view].length
+        );
 
-      //       let icon = L.divIcon({
-      //         className: "facilities-marker",
-      //         icData: iconData,
-      //         html: mhtml,
-      //         popupAnchor: [0, 200],
-      //       });
+        for (
+          let stIdx = 0;
+          stIdx < this.mapNationalData[this.view].length;
+          stIdx++
+        ) {
+          const mpData = this.mapNationalData[this.view][stIdx];
+          // console.log("lgaMpData: ", mpData);
+          if (
+            mpData.States_supported.some((stateObj) => stateObj.state === st)
+          ) {
+            let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+            let randFacility = lgaFclts[randomIndex];
 
-      //       L.marker(cords, { icon: icon })
-      //         .addTo(this.map)
-      //         .on("click", this.markerEventNational);
-      //       // national
-      //     });
-      //   }
-      // }
+            let cords = [
+              randFacility.geometry.coordinates[1],
+              randFacility.geometry.coordinates[0],
+            ];
+
+            let mhtml = "";
+
+            // mpData.Type_of_Support.forEach((tp) => {
+            //   let spt = this.supportTypes.find(
+            //     (item) => item.name === tp.support_type
+            //   );
+            //   if (spt) {
+            //     this.currentSupports[this.view][spt.name] = {
+            //       bg: spt.bg,
+            //       txt: spt.txt,
+            //     };
+            //   }
+            // });
+
+            // if (mpData.Status_of_support == "In Progress") {
+            //   mhtml = `
+            // <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
+            // `;
+            // } else if (mpData.Status_of_support == "Completed") {
+            //   mhtml = `
+            // <div class="shadow-sm w-3 h-3 bg-green-300"></div>
+            // `;
+            // } else {
+            //   mhtml = `
+            // <b class="w-0 h-0
+            //   border-l-[6px] border-l-transparent
+            //   border-b-[12px] border-red-300
+            //   border-r-[6px] border-r-transparent">
+            // </b>
+            // `;
+            // }
+
+            let icon = L.divIcon({
+              className: "facilities-marker",
+              icData: mpData,
+              html: this.statusIconHTML(mpData.Status_of_support),
+              popupAnchor: [0, 200],
+            });
+
+            L.marker(cords, { icon: icon, autoPan: true, autoPanOnFocus: true })
+              .addTo(this.map)
+              .on("click", this.markerEventNational);
+          }
+        }
+      }
     },
 
     createNationalMap() {
@@ -1987,6 +2000,11 @@ export const useMainStore = defineStore("useMainStore", {
       mapContainerParent.appendChild(mapContainer);
 
       this.currentSupports[this.view] = {};
+
+      if (this.map) {
+        this.map.remove();
+        mapContainer.innerHTML = "";
+      }
 
       this.map = L.map(mapContainer, {
         zoomSnap: 0.2,
@@ -2006,38 +2024,80 @@ export const useMainStore = defineStore("useMainStore", {
       this.map.setMaxBounds(this.geoJson.getBounds());
     },
 
-    // ---------
+    createLGAsMap() {
+      var mapContainerParent = this.mapContainerRef.parentNode;
+      var mapContainer = this.mapContainerRef;
 
-    // async createMap() {
-    //   var mapContainerParent = this.mapContainerRef.parentNode;
-    //   var mapContainer = this.mapContainerRef;
+      mapContainerParent.removeChild(this.mapContainerRef);
+      mapContainerParent.appendChild(mapContainer);
 
-    //   mapContainerParent.removeChild(this.mapContainerRef);
+      // this.currentSupports[this.view] = {};
 
-    //   mapContainerParent.appendChild(mapContainer);
+      // if (this.map) {
+      //   this.map.remove();
+      //   mapContainer.innerHTML = "";
+      // }
+      // this.map = L.map(mapContainer, {
+      //   zoomSnap: 0.2,
+      // });
+
+      // this.map.scrollWheelZoom.disable();
+      // this.map.keyboard.disable();
+      // this.mapInfo.update = this.mapInfoOnUpdate;
+      // this.natonalMapMarkers = L.layerGroup();
+
+      if (this.lgasMapMarkers) {
+        // this.lgasMapMarkers.clearLayers();
+        this.map.removeLayer(this.lgasMapMarkers);
+      }
+
+      this.lgasMapMarkers = L.layerGroup();
+
+      // if (this.lgaGeoJson) {
+      //   this.map.removeLayer(this.lgaGeoJson);
+      // }
+
+      this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
+        style: this.layerStyle,
+        onEachFeature: this.onEachLGAsMapFeature,
+      }).addTo(this.map);
+
+      // this.fitBounds(this.geoJson);
+      let lgasBounds = this.lgaGeoJson.getBounds();
+      this.map.fitBounds(lgasBounds);
+      this.map.setMaxBounds(lgasBounds);
+    },
+
+    // createLGAsMap() {
+    //   var mapLgaContainerParent = this.mapContainerLGARef.parentNode;
+    //   var mapLgaContainer = this.mapContainerLGARef;
+
+    //   mapLgaContainerParent.removeChild(this.mapContainerLGARef);
+    //   mapLgaContainerParent.appendChild(mapLgaContainer);
+
+    //   if (this.lgaMap) {
+    //     this.lgaMap.remove();
+    //     mapLgaContainer.innerHTML = "";
+    //   }
 
     //   this.currentSupports[this.view] = {};
 
-    //   // if (this.map == null) {
-    //   this.map = L.map(mapContainer, {
-    //     zoomSnap: 0.1,
+    //   this.lgaMap = L.map(mapLgaContainer, {
+    //     zoomSnap: 0.2,
     //   });
 
-    //   this.map.scrollWheelZoom.disable();
-
-    //   this.map.keyboard.disable();
-
+    //   this.lgaMap.scrollWheelZoom.disable();
+    //   this.lgaMap.keyboard.disable();
     //   this.mapInfo.update = this.mapInfoOnUpdate;
+    //   this.lgasMapMarkers = L.layerGroup();
 
-    //   this.mapMarkers = L.layerGroup();
-    //   // console.log(this.mapGeoData);
-    //   this.geoJson = L.geoJson(this.mapGeoData, {
+    //   this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
     //     style: this.layerStyle,
-    //     onEachFeature: this.onEachMapFeature,
-    //   }).addTo(this.map);
+    //     onEachFeature: this.onEachLGAsMapFeature,
+    //   }).addTo(this.lgaMap);
 
-    //   this.fitBounds(this.geoJson);
-    //   this.map.setMaxBounds(this.geoJson.getBounds());
+    //   this.fitBounds(this.lgaGeoJson);
+    //   this.lgaMap.setMaxBounds(this.lgaGeoJson.getBounds());
     // },
   },
 });

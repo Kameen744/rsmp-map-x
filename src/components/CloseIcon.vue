@@ -1,5 +1,5 @@
 <template>
-  <svg
+  <!-- <svg
     class="mt-1 ml-1 w-6 h-6 text-gray-800"
     aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
@@ -15,10 +15,10 @@
       stroke-width="2"
       d="M6 18 17.94 6M18 18 6.06 6"
     />
-  </svg>
+  </svg> -->
 
   <!-- unchecked checkbox -->
-  <!-- <svg
+  <svg
     class="mt-1 ml-1 w-6 h-6 text-gray-800"
     width="24"
     height="24"
@@ -35,5 +35,5 @@
       stroke="#000000"
       stroke-width="2"
     />
-  </svg> -->
+  </svg>
 </template>

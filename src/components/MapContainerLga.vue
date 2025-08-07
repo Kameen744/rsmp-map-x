@@ -1,12 +1,7 @@
 <template>
-  <div v-show="view == 'map'" class="relative">
-    <div
-      ref="mapContainerRef"
-      class="min-h-[80vh] max-h-[80vh] overflow-hidden"
-      :class="markerSelected() ? 'mr-[300px]' : ''"
-    >
-    </div>
-    <div class="absolute top-[10px] left-[80px] z-[991] bg-transparent">
+  <div v-show="view == 'map' && mapType == 'lgas'" class="relative">
+    <div ref="mapContainerLGARef" class="min-h-[80vh] max-h-[80vh]"> </div>
+    <div class="absolute top-[10px] left-[80px] z-[992] bg-transparent">
       <div
         v-if="currentSupports[view]"
         class="font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]"
@@ -64,20 +59,20 @@ import MarkerPopup from "./MarkerPopup.vue";
 const store = useMainStore();
 const showSupportTypes = ref(false);
 const {
-  mapContainerRef,
+  // mapContainerRef,
   selectedLgaMarker,
   currentSupports,
   mapData,
   selectedMarker,
-  // mapContainerRefMain,
+  mapContainerLGARef,
   view,
   mapType,
 } = storeToRefs(store);
 
-onMounted(async () => {
-  // mapContainerRefMain.value = mapContainerRef.value;
-  await store.launchAapp();
-});
+// onMounted(async () => {
+//   // mapContainerLGARef.value = mapContainerRefLga.value;
+//   // await store.launchAappLga();
+// });
 
 const markerSelected = () => {
   if (selectedLgaMarker.value || selectedMarker.value) {

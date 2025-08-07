@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from "pinia";
 import SelectBadge from "./SelectBadge.vue";
@@ -94,8 +94,9 @@ const SelectLga = (lga) => {
   } else {
     selectedLga.value[view.value] = spt.filter((item) => item !== lga.lga);
   }
-  console.log(selectedLga.value[view.value]);
-  // store.updateApp();
+
+  // console.log(selectedLga.value[view.value]);
+  store.updateApp();
 };
 
 // const SelectLga = (lga) => {

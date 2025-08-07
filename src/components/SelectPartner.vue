@@ -14,12 +14,8 @@
           <div v-if="selectedPartners[view].length <= 0" class="text-nowrap">
             Partners
           </div>
-          <div
-            v-else
-            class="text-nowrap"
-            v-for="partner in selectedPartners[view].slice(-2)"
-          >
-            {{ partner }}
+          <div v-else class="text-nowrap">
+            {{ selectedPartners[view].length }} Selected
           </div>
         </div>
         <b
@@ -30,11 +26,20 @@
       </div>
       <ul
         tabindex="0"
-        class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec"
+        class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec rounded-md"
       >
+        <li class="rounded-md border-b-2 border-blue-50">
+          <a
+            href=""
+            @click.prevent="selectAllPartners()"
+            class="hover:rounded-md text-lg inline-flex justify-between"
+          >
+            <span>Select All</span>
+          </a>
+        </li>
         <template v-for="partner in partners">
           <li
-            class="rounded-none border-b-2 border-blue-50"
+            class="rounded-md border-b-2 border-blue-50"
             v-if="filterPartners(partner)"
             :class="
               store.selected(selectedPartners[view], partner.partner)
@@ -45,11 +50,11 @@
             <a
               href=""
               @click.prevent="SelectPartner(partner)"
-              class="hover:rounded-none text-lg inline-flex justify-between"
+              class="hover:rounded-md text-lg inline-flex justify-between"
             >
               <span>{{ partner.short_name }}</span>
               <b
-                class="w-8 h-8 rounded-full pr-1 bg-blue-200 text-center text-xs text-blue-900"
+                class="w-8 h-8 rounded-full pr-1 text-center text-xs text-blue-900"
               >
                 <CheckIcon
                   v-if="
@@ -77,6 +82,8 @@ import CheckIcon from "./CheckIcon.vue";
 import CloseIcon from "./CloseIcon.vue";
 
 const store = useMainStore();
+const { selectedPartners, view, partners, selected } = storeToRefs(store);
+
 const filterPartners = (pt) => {
   if (view.value == "chart" && pt.cso_partner == "1") {
     return false;
@@ -86,16 +93,28 @@ const filterPartners = (pt) => {
 
 const SelectPartner = (partner) => {
   let spt = selectedPartners.value[view.value];
-  if (!spt.includes(partner.partner)) {
+  if (spt.length == partners.value.length) {
+    selectedPartners.value[view.value] = [];
     selectedPartners.value[view.value].push(partner.partner);
   } else {
-    selectedPartners.value[view.value] = spt.filter(
-      (item) => item !== partner.partner
-    );
+    if (!spt.includes(partner.partner)) {
+      selectedPartners.value[view.value].push(partner.partner);
+    } else {
+      selectedPartners.value[view.value] = spt.filter(
+        (item) => item !== partner.partner
+      );
+    }
   }
-  console.log(selectedPartners.value[view.value]);
-  // store.updateApp();
+
+  // console.log(selectedPartners.value[view.value]);
+  store.updateApp();
 };
 
-const { selectedPartners, view, partners, selected } = storeToRefs(store);
+const selectAllPartners = async () => {
+  selectedPartners.value[view.value] = [];
+  for (let i = 0; i < partners.value.length; i++) {
+    selectedPartners.value[view.value].push(partners.value[i].partner);
+  }
+  store.updateApp();
+};
 </script>

@@ -2,8 +2,28 @@
   <div
     class="z-[9999] fixed top-[11vh] max-h-[90vh] min-w-[500px] max-w-[500px] right-2 flex bg-transparent p-0 overflow-x-auto"
   >
+  
     <div class="max-w-5xl mx-auto p-4">
       <div class="bg-white shadow-lg rounded-xl p-6 space-y-6">
+        <b
+        @click="store.closePopup"
+        class="z-[99] cursor-pointer absolute top-[10px] right-[10px] shadow-lg hover:bg-slate-200 ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="mt-1 ml-1 w-6 h-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18 18 6M6 6l12 12"
+          />
+        </svg>
+      </b>
         <!-- Respondent Info -->
         <!-- <div>
           <h2 class="text-xl font-semibold mb-2">Respondent Info</h2>

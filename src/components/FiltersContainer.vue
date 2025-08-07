@@ -3,7 +3,7 @@
     <div class="container max-w-[89%] mx-auto px-0">
       <ul class="menu menu-horizontal flex p-0 py-2 justify-start">
         <SelectState></SelectState>
-        <SelectLga></SelectLga>
+        <!-- <SelectLga></SelectLga> -->
         <SelectPartner></SelectPartner>
         <SelectProgram></SelectProgram>
         <SelectSupport></SelectSupport>
