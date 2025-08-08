@@ -127,7 +127,8 @@ const selectAllStates = async () => {
     for (let i = 0; i < states.value.length; i++) {
       selectedState.value[view.value].push(states.value[i].state);
     }
-    store.launchAapp();
+    // store.launchAapp();
+    store.updateApp();
   }
 
   // states.value.forEach((s) => {
