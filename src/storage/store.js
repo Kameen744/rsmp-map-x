@@ -1960,17 +1960,17 @@ export const useMainStore = defineStore("useMainStore", {
       let mhtml = "";
       if (Status_of_support == "In Progress") {
         mhtml = `
-            <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-300"></div>
+            <div class="shadow-sm w-3 h-3 rounded-full bg-yellow-400"></div>
             `;
       } else if (Status_of_support == "Completed") {
         mhtml = `
-            <div class="shadow-sm w-3 h-3 bg-green-300"></div>
+            <div class="shadow-sm w-3 h-3 bg-green-400"></div>
             `;
       } else {
         mhtml = `
             <b class="w-0 h-0
               border-l-[6px] border-l-transparent
-              border-b-[12px] border-red-300
+              border-b-[12px] border-red-400
               border-r-[6px] border-r-transparent">
             </b>
             `;

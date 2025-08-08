@@ -32,17 +32,17 @@
         <div class="flex justify-start p-2">
           <div class="mr-3">
             <div
-              class="mx-auto shadow-sm w-8 h-8 rounded-full bg-yellow-300"
+              class="mx-auto shadow-sm w-8 h-8 rounded-full bg-yellow-400"
             ></div>
             <b>Ongoing</b>
           </div>
           <div class="mr-3">
-            <div class="mx-auto shadow-sm w-8 h-8 bg-green-300"></div>
+            <div class="mx-auto shadow-sm w-8 h-8 bg-green-400"></div>
             <b>Completed</b>
           </div>
           <div class="mr-3">
             <div
-              class="mx-auto w-0 h-0 border-l-[20px] border-l-transparent border-b-[32px] border-red-300 border-r-[20px] border-r-transparent"
+              class="mx-auto w-0 h-0 border-l-[20px] border-l-transparent border-b-[32px] border-red-400 border-r-[20px] border-r-transparent"
             >
             </div>
             <b>Pending</b>
