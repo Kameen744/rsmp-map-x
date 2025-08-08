@@ -61,7 +61,7 @@ onMounted(() => {
   selectedPrograms.value[view.value] = [];
   selectedPartners.value[view.value] = [];
   selectedSupports.value[view.value] = [];
-  selectedStatus.value[view.value] = ["In Progress"];
+  selectedStatus.value[view.value] = [];
   // selectedStatus.value[view.value] = ["Ongoing"];
   // "AFENET", "McKinsey", "UNICEF", "WHO"
   ready.value = true;

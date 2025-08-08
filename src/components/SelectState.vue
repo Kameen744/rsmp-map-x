@@ -124,10 +124,11 @@ const SelectState = async (state) => {
 const selectAllStates = async () => {
   if (selectedState.value[view.value].length < states.value.length) {
     selectedState.value[view.value] = [];
-    for (let i = 0; i < states.value.length; i++) {
-      selectedState.value[view.value].push(states.value[i].state);
-    }
+    // for (let i = 0; i < states.value.length; i++) {
+    //   selectedState.value[view.value].push(states.value[i].state);
+    // }
     // store.launchAapp();
+
     store.updateApp();
   }
 

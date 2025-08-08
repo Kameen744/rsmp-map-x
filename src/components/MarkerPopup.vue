@@ -259,9 +259,9 @@ const getSpBg = (spName) => {
   return sp.bg;
 };
 const { selectedMarker, selectedLgaMarker, supportTypes } = storeToRefs(store);
-onMounted(() => {
-  console.log(selectedMarker.value);
-});
+// onMounted(() => {
+//   console.log(selectedMarker.value);
+// });
 </script>
 
 <style scoped>

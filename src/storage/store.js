@@ -611,9 +611,9 @@ export const useMainStore = defineStore("useMainStore", {
         // });
       }
 
-      this.states.forEach((s) => {
-        this.selectedState[this.view].push(s.state);
-      });
+      // this.states.forEach((s) => {
+      //   this.selectedState[this.view].push(s.state);
+      // });
     },
 
     async fetchLgas() {
@@ -930,49 +930,49 @@ export const useMainStore = defineStore("useMainStore", {
         let st = d.state;
         let lg = d.lga;
 
-        if (this.selectedState[this.view].includes(st)) {
-          // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
-          let lgaFclts = await this.getRandLgaFacilities(
-            st,
-            lg,
-            this.mapLgaData[this.view].length
-          );
+        // if (this.selectedState[this.view].includes(st)) {
+        // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+        let lgaFclts = await this.getRandLgaFacilities(
+          st,
+          lg,
+          this.mapLgaData[this.view].length
+        );
 
-          for (
-            let stIdx = 0;
-            stIdx < this.mapLgaData[this.view].length;
-            stIdx++
-          ) {
-            const mpData = this.mapLgaData[this.view][stIdx];
+        for (
+          let stIdx = 0;
+          stIdx < this.mapLgaData[this.view].length;
+          stIdx++
+        ) {
+          const mpData = this.mapLgaData[this.view][stIdx];
+          // console.log(mpData);
+          if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
+            // let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+            let randFacility = lgaFclts[stIdx];
 
-            if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
-              let randomIndex = Math.floor(Math.random() * lgaFclts.length);
-              let randFacility = lgaFclts[randomIndex];
+            let cords = [
+              randFacility.geometry.coordinates[1],
+              randFacility.geometry.coordinates[0],
+            ];
 
-              let cords = [
-                randFacility.geometry.coordinates[1],
-                randFacility.geometry.coordinates[0],
-              ];
+            let mhtml = "";
 
-              let mhtml = "";
+            let icon = L.divIcon({
+              className: "facilities-marker",
+              icData: mpData,
+              html: this.statusIconHTML(mpData.Status_of_support),
+              popupAnchor: [0, 200],
+            });
 
-              let icon = L.divIcon({
-                className: "facilities-marker",
-                icData: mpData,
-                html: this.statusIconHTML(mpData.Status_of_support),
-                popupAnchor: [0, 200],
-              });
-
-              L.marker(cords, {
-                icon: icon,
-                autoPan: true,
-                autoPanOnFocus: true,
-              })
-                .addTo(this.lgasMapMarkers)
-                .on("click", this.markerEventNational);
-            }
+            L.marker(cords, {
+              icon: icon,
+              autoPan: true,
+              autoPanOnFocus: true,
+            })
+              .addTo(this.lgasMapMarkers)
+              .on("click", this.markerEventNational);
           }
         }
+        // }
       });
 
       let mapContainerParent = this.mapContainerRef.parentNode;
@@ -1306,69 +1306,69 @@ export const useMainStore = defineStore("useMainStore", {
         });
 
         let st = d.state;
-        if (this.selectedState[this.view].includes(st)) {
-          // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
-          let lgaFclts = await this.getRandStateFacilities(
-            st,
-            this.mapNationalData[this.view].length
-          );
+        // if (this.selectedState[this.view].includes(st)) {
+        // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
+        let lgaFclts = await this.getRandStateFacilities(
+          st,
+          this.mapNationalData[this.view].length
+        );
 
-          for (
-            let stIdx = 0;
-            stIdx < this.mapNationalData[this.view].length;
-            stIdx++
+        for (
+          let stIdx = 0;
+          stIdx < this.mapNationalData[this.view].length;
+          stIdx++
+        ) {
+          const mpData = this.mapNationalData[this.view][stIdx];
+
+          // if (
+          //   !this.partners.some(
+          //     (p) => p.partner == mpData.Name_of_Organization_Agency
+          //   )
+          // ) {
+          //   console.log("not in: ", mpData.Name_of_Organization_Agency);
+          // }
+
+          if (
+            mpData.States_supported.some((stateObj) => stateObj.state === st)
           ) {
-            const mpData = this.mapNationalData[this.view][stIdx];
+            // let randomIndex = Math.floor(Math.random() * lgaFclts.length);
+            let randFacility = lgaFclts[stIdx];
 
-            // if (
-            //   !this.partners.some(
-            //     (p) => p.partner == mpData.Name_of_Organization_Agency
-            //   )
-            // ) {
-            //   console.log("not in: ", mpData.Name_of_Organization_Agency);
-            // }
+            let cords = [
+              randFacility.geometry.coordinates[1],
+              randFacility.geometry.coordinates[0],
+            ];
 
-            if (
-              mpData.States_supported.some((stateObj) => stateObj.state === st)
-            ) {
-              let randomIndex = Math.floor(Math.random() * lgaFclts.length);
-              let randFacility = lgaFclts[randomIndex];
+            let mhtml = "";
+            mpData.Type_of_Support.forEach((tp) => {
+              let spt = this.supportTypes.find(
+                (item) => item.name === tp.support_type
+              );
+              if (spt) {
+                this.currentSupports[this.view][spt.name] = {
+                  bg: spt.bg,
+                  txt: spt.txt,
+                };
+              }
+            });
 
-              let cords = [
-                randFacility.geometry.coordinates[1],
-                randFacility.geometry.coordinates[0],
-              ];
+            let icon = L.divIcon({
+              className: "facilities-marker",
+              icData: mpData,
+              html: this.statusIconHTML(mpData.Status_of_support),
+              popupAnchor: [0, 200],
+            });
 
-              let mhtml = "";
-              mpData.Type_of_Support.forEach((tp) => {
-                let spt = this.supportTypes.find(
-                  (item) => item.name === tp.support_type
-                );
-                if (spt) {
-                  this.currentSupports[this.view][spt.name] = {
-                    bg: spt.bg,
-                    txt: spt.txt,
-                  };
-                }
-              });
-
-              let icon = L.divIcon({
-                className: "facilities-marker",
-                icData: mpData,
-                html: this.statusIconHTML(mpData.Status_of_support),
-                popupAnchor: [0, 200],
-              });
-
-              L.marker(cords, {
-                icon: icon,
-                autoPan: true,
-                autoPanOnFocus: true,
-              })
-                .addTo(this.natonalMapMarkers)
-                .on("click", this.markerEventNational);
-            }
+            L.marker(cords, {
+              icon: icon,
+              autoPan: true,
+              autoPanOnFocus: true,
+            })
+              .addTo(this.natonalMapMarkers)
+              .on("click", this.markerEventNational);
           }
         }
+        // }
       });
     },
 
@@ -1464,8 +1464,10 @@ export const useMainStore = defineStore("useMainStore", {
 
     markerEventNational(e) {
       // this.selectedLgaMarker = null;
-      this.selectedMarker = e.target.options.icon.options.icData;
-      // console.log(this.selectedMarker);
+      this.selectedMarker = null;
+      setTimeout(() => {
+        this.selectedMarker = e.target.options.icon.options.icData;
+      }, 80);
     },
 
     // async createNationalDataPoints() {
