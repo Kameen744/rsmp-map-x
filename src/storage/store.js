@@ -944,9 +944,8 @@ export const useMainStore = defineStore("useMainStore", {
             stIdx++
           ) {
             const mpData = this.mapLgaData[this.view][stIdx];
-            console.log("lgassp: ", mpData.LGA_supported);
+
             if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
-              console.log("lgaMpData: ", mpData);
               let randomIndex = Math.floor(Math.random() * lgaFclts.length);
               let randFacility = lgaFclts[randomIndex];
 
@@ -1320,6 +1319,14 @@ export const useMainStore = defineStore("useMainStore", {
             stIdx++
           ) {
             const mpData = this.mapNationalData[this.view][stIdx];
+
+            if (
+              !this.partners.some(
+                (p) => p.partner == mpData.Name_of_Organization_Agency
+              )
+            ) {
+              console.log("not in: ", mpData.Name_of_Organization_Agency);
+            }
 
             // if (!this.partners.includes(mpData.Name_of_Organization_Agency)) {
             //   this.partners.push({});
