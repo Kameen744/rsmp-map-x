@@ -100,23 +100,28 @@ const sortedStates = computed(() => {
 });
 
 const SelectState = async (state) => {
-  let sspt = selectedState.value[view.value];
-  if (sspt.length == states.value.length) {
-    selectedState.value[view.value] = [];
-    selectedState.value[view.value].push(state.state);
-  } else {
-    if (!sspt.includes(state.state)) {
-      selectedState.value[view.value].push(state.state);
-    } else {
-      selectedState.value[view.value] = sspt.filter(
-        (item) => item !== state.state
-      );
-    }
-  }
+  // let sspt = selectedState.value[view.value];
+  // let ssptLength = sspt.length;
+  // if (ssptLength == states.value.length) {
+  //   selectedState.value[view.value] = [];
+  //   selectedState.value[view.value].push(state.state);
+  // } else {
+  //   if (!sspt.includes(state.state)) {
+  //     selectedState.value[view.value].push(state.state);
+  //   } else {
+  //     selectedState.value[view.value] = sspt.filter(
+  //       (item) => item !== state.state
+  //     );
+  //   }
+  // }
 
-  if (selectedState.value[view.value].length == 1) {
-    store.launchAappLga();
-  }
+  // if (selectedState.value[view.value].length == 1) {
+  //   store.launchAappLga();
+  // }
+
+  selectedState.value[view.value] = [];
+  selectedState.value[view.value].push(state.state);
+  store.launchAappLga();
   // console.log(selectedState.value[view.value]);
   // store.updateApp();
 };
@@ -124,12 +129,14 @@ const SelectState = async (state) => {
 const selectAllStates = async () => {
   if (selectedState.value[view.value].length < states.value.length) {
     selectedState.value[view.value] = [];
-    // for (let i = 0; i < states.value.length; i++) {
-    //   selectedState.value[view.value].push(states.value[i].state);
-    // }
+    for (let i = 0; i < states.value.length; i++) {
+      selectedState.value[view.value].push(states.value[i].state);
+    }
     // store.launchAapp();
 
     store.updateApp();
+  } else {
+    selectedState.value[view.value] = [];
   }
 
   // states.value.forEach((s) => {

@@ -994,6 +994,7 @@ export const useMainStore = defineStore("useMainStore", {
     },
 
     async updateApp() {
+      this.isLaoding = true;
       // await this.fetchMapData();
       if (this.view == "map") {
         // await this.mapMarkers.clearLayers();
@@ -1005,6 +1006,7 @@ export const useMainStore = defineStore("useMainStore", {
         await this.loadNationalMapGeometry();
         // await this.createMap();
         await this.createNationalMap();
+        // this.isLaoding =false;
         // } else {
         //   await this.fetchMapData();
         //   await this.loadGeoData();

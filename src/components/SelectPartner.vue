@@ -111,10 +111,15 @@ const SelectPartner = (partner) => {
 };
 
 const selectAllPartners = async () => {
-  selectedPartners.value[view.value] = [];
-  // for (let i = 0; i < partners.value.length; i++) {
-  //   selectedPartners.value[view.value].push(partners.value[i].partner);
-  // }
+  if (selectedPartners.value[view.value].length < partners.value.length) {
+    selectedPartners.value[view.value] = [];
+    for (let i = 0; i < partners.value.length; i++) {
+      selectedPartners.value[view.value].push(partners.value[i].partner);
+    }
+  } else {
+    selectedPartners.value[view.value] = [];
+  }
+
   store.updateApp();
 };
 </script>

@@ -1,5 +1,19 @@
 <template>
   <template v-if="ready">
+    <!-- <div class="vl-parent">
+      
+:on-cancel="onCancel"
+      <label><input type="checkbox" v-model="fullPage" />Full page?</label>
+      <button @click.prevent="doAjax">fetch Data</button>
+    </div> -->
+    <loading
+      v-model:active="isLaoding"
+      :can-cancel="false"
+      :is-full-page="true"
+      loader="dots"
+      :z-index="99999999999"
+      color="#1F3559"
+    />
     <TopNavBar></TopNavBar>
     <FiltersContainer></FiltersContainer>
     <div
@@ -35,7 +49,9 @@ import PartnerContainer from "./components/PartnerContainer.vue";
 import CsoContainer from "./components/CsoContainer.vue";
 import PartnerInsContainer from "./components/PartnerInsContainer.vue";
 import MapContainerLga from "./components/MapContainerLga.vue";
-import TestMap from "./components/TestMap.vue";
+// import TestMap from "./components/TestMap.vue";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/css/index.css";
 
 const store = useMainStore();
 const ready = ref(false);
@@ -51,6 +67,7 @@ const {
   view,
   selectedStatus,
   mapType,
+  isLaoding,
 } = storeToRefs(store);
 
 onMounted(() => {
