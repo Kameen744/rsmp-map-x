@@ -1320,16 +1320,12 @@ export const useMainStore = defineStore("useMainStore", {
           ) {
             const mpData = this.mapNationalData[this.view][stIdx];
 
-            if (
-              !this.partners.some(
-                (p) => p.partner == mpData.Name_of_Organization_Agency
-              )
-            ) {
-              console.log("not in: ", mpData.Name_of_Organization_Agency);
-            }
-
-            // if (!this.partners.includes(mpData.Name_of_Organization_Agency)) {
-            //   this.partners.push({});
+            // if (
+            //   !this.partners.some(
+            //     (p) => p.partner == mpData.Name_of_Organization_Agency
+            //   )
+            // ) {
+            //   console.log("not in: ", mpData.Name_of_Organization_Agency);
             // }
 
             if (
