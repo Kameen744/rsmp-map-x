@@ -693,6 +693,8 @@ export const useMainStore = defineStore("useMainStore", {
         { partner: "WHO", short_name: "WHO", cso_partner: 0 },
       ];
 
+      // this.selectedPartners[this.view].length = 0;
+
       // this.partners.forEach((p) => {
       //   this.selectedPartners[this.view].push(p.partner);
       // });
@@ -1318,6 +1320,10 @@ export const useMainStore = defineStore("useMainStore", {
             stIdx++
           ) {
             const mpData = this.mapNationalData[this.view][stIdx];
+
+            // if (!this.partners.includes(mpData.Name_of_Organization_Agency)) {
+            //   this.partners.push({});
+            // }
 
             if (
               mpData.States_supported.some((stateObj) => stateObj.state === st)
