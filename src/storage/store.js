@@ -1111,51 +1111,81 @@ export const useMainStore = defineStore("useMainStore", {
         await this.fetchNationalMapData();
         const that = this;
         let partnerSummaryData = {};
+        let addToSumData = (cFocus, orgAgency, dObj) => {
+          if (
+            orgAgency ==
+            "Centre for Well-being and Integrated Nutrition Solutions"
+          ) {
+            orgAgency =
+              "Centre for Well-being and Integrated Nutrition Solutions (C-WINS)";
+          }
+
+          if (cFocus && cFocus != "") {
+            if (!partnerSummaryData[cFocus]) {
+              partnerSummaryData[cFocus] = {};
+            }
+            if (!partnerSummaryData[cFocus][orgAgency]) {
+              partnerSummaryData[cFocus][orgAgency] = [];
+            }
+
+            let exst = partnerSummaryData[cFocus][orgAgency].some((obj) => {
+              if (
+                obj.End_date_of_support == dObj.End_date_of_support &&
+                obj.Start_date_of_support == dObj.Start_date_of_support &&
+                JSON.stringify(obj.Level_of_support) ===
+                  JSON.stringify(dObj.Level_of_support) &&
+                obj.Who_is_the_Funder_of_your_project ==
+                  obj.Who_is_the_Funder_of_your_project
+              ) {
+                return obj;
+              } else {
+                return false;
+              }
+            });
+
+            // console.log("exists: ", exst);
+            if (!exst) {
+              partnerSummaryData[cFocus][orgAgency].push(dObj);
+            }
+          }
+        };
         const insData = this.mapNationalData[this.view];
         for (let i = 0; i < insData.length; i++) {
           let dObj = insData[i];
 
           // arrange data by 'dObj.Name_of_Organization_Agency'?
+          addToSumData(
+            dObj.Campaign_Focus_Other,
+            dObj.Name_of_Organization_Agency,
+            dObj
+          );
 
-          // if (!partnerSummaryData[dObj.Campaign_Focus_Other]) {
-          //   partnerSummaryData[dObj.Campaign_Focus_Other] = {};
-
-          //   partnerSummaryData[dObj.Campaign_Focus_Other][]
-          // }
-
-          // dObj.Campaign_Focus.forEach((campaign) => {
-          //   if (!partnerSummaryData[campaign]) {
-          //     partnerSummaryData[campaign] = {};
-          //   }
-          // });
-
-          console.log(dObj);
-          // Object.keys(insData[st]).forEach((lg) => {
-          //   insData[st][lg].forEach((progData) => {
-          //     let prgArea = progData.program_area;
-          //     let partner = progData.partner;
-          //     if (!partnerSummaryData[prgArea]) {
-          //       partnerSummaryData[prgArea] = {};
-          //     }
-          //     if (!partnerSummaryData[prgArea][partner]) {
-          //       partnerSummaryData[prgArea][partner] = [];
-          //     }
-          //     let hasSupport = partnerSummaryData[prgArea][partner].some(
-          //       (obj) => obj.type_of_support === progData.type_of_support
-          //     );
-          //     if (!hasSupport) {
-          //       partnerSummaryData[prgArea][partner].push(progData);
-          //     }
-          //   });
-          // });
+          dObj.Campaign_Focus.forEach((campaign) => {
+            addToSumData(campaign, dObj.Name_of_Organization_Agency, dObj);
+          });
         }
-        // Object.keys(insData).forEach((st) => {
-        //   console.log(st);
-
-        // });
 
         that.partnerSummaryData = partnerSummaryData;
       }
+
+      // Object.keys(insData[st]).forEach((lg) => {
+      //   insData[st][lg].forEach((progData) => {
+      //     let prgArea = progData.program_area;
+      //     let partner = progData.partner;
+      //     if (!partnerSummaryData[prgArea]) {
+      //       partnerSummaryData[prgArea] = {};
+      //     }
+      //     if (!partnerSummaryData[prgArea][partner]) {
+      //       partnerSummaryData[prgArea][partner] = [];
+      //     }
+      //     let hasSupport = partnerSummaryData[prgArea][partner].some(
+      //       (obj) => obj.type_of_support === progData.type_of_support
+      //     );
+      //     if (!hasSupport) {
+      //       partnerSummaryData[prgArea][partner].push(progData);
+      //     }
+      //   });
+      // });
 
       // {
       //     "Are_you_collaborating_with_any_other_partners": "Yes",
