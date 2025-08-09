@@ -140,6 +140,10 @@ const logout = async () => {
 };
 </script>
 <style scoped>
+.map-btn:focus {
+  color: aliceblue;
+  background-color: #00ccbe40;
+}
 .map-btn {
   /* primary nav pill list */
 
