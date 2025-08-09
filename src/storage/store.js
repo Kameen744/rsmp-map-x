@@ -25,6 +25,7 @@ export const useMainStore = defineStore("useMainStore", {
     partners: null,
     programAreas: null,
     supportTypes: null,
+    thematicAreas: null,
     currentSupports: {},
     viewingMap: null,
     viewingLgaMap: null,
@@ -72,6 +73,7 @@ export const useMainStore = defineStore("useMainStore", {
     selectedPrograms: {},
     selectedSupports: {},
     selectedStatus: {},
+    selectedThematicAreas: {},
     selectedStartDate: "2020-01-01",
     selectedEndDate: "2030-12-31",
   }),
@@ -888,36 +890,138 @@ export const useMainStore = defineStore("useMainStore", {
       this.isLaoding = false;
     },
 
+    // async launchAappLga() {
+    //   this.isLaoding = true;
+    //   this.mapType = "lgas";
+    //   await this.fetchLgas();
+    //   await this.fetchLgaMapData();
+
+    //   this.mapGeoDataLga = {
+    //     type: "FeatureCollection",
+    //     features: [],
+    //   };
+
+    //   if (this.lgasMapMarkers) {
+    //     this.map.removeLayer(this.lgasMapMarkers);
+    //   }
+    //   this.map.removeLayer(this.natonalMapMarkers);
+    //   this.lgasMapMarkers = L.layerGroup().addTo(this.map);
+
+    //   if (this.lgaGeoJson) {
+    //     this.map.removeLayer(this.lgaGeoJson);
+    //   }
+
+    //   this.lgas.forEach(async (d) => {
+
+    //     this.mapGeoDataLga.features.push({
+    //       type: "Feature",
+    //       id: `${d.state}-${d.lga}`,
+    //       properties: {
+    //         state: d.state,
+    //         lga: d.lga,
+    //       },
+    //       geometry: d.geometry,
+    //     });
+
+    //     let st = d.state;
+    //     let lg = d.lga;
+
+    //     let lgaFclts = await this.getRandLgaFacilities(
+    //       st,
+    //       lg,
+    //       this.mapLgaData[this.view].length
+    //     );
+
+    //     for (
+    //       let stIdx = 0;
+    //       stIdx < this.mapLgaData[this.view].length;
+    //       stIdx++
+    //     ) {
+    //       const mpData = this.mapLgaData[this.view][stIdx];
+
+    //       if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
+
+    //         let randFacility = lgaFclts[stIdx];
+
+    //         let cords = [
+    //           randFacility.geometry.coordinates[1],
+    //           randFacility.geometry.coordinates[0],
+    //         ];
+
+    //         let mhtml = "";
+
+    //         let icon = L.divIcon({
+    //           className: "facilities-marker",
+    //           icData: mpData,
+    //           html: this.statusIconHTML(mpData.Status_of_support),
+    //           popupAnchor: [0, 200],
+    //         });
+
+    //         L.marker(cords, {
+    //           icon: icon,
+    //           autoPan: true,
+    //           autoPanOnFocus: true,
+    //         })
+    //           .addTo(this.lgasMapMarkers)
+    //           .on("click", this.markerEventNational);
+    //       }
+    //     }
+
+    //   });
+
+    //   let mapContainerParent = this.mapContainerRef.parentNode;
+    //   let mapContainer = this.mapContainerRef;
+
+    //   mapContainerParent.removeChild(this.mapContainerRef);
+    //   mapContainerParent.appendChild(mapContainer);
+
+    //   this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
+    //     style: this.layerStyle,
+    //     onEachFeature: this.onEachLGAsMapFeature,
+    //   }).addTo(this.map);
+
+    //   // this.fitBounds(this.geoJson);
+    //   let lgasBounds = this.lgaGeoJson.getBounds();
+    //   this.map.fitBounds(lgasBounds);
+    //   this.map.setMaxBounds(lgasBounds);
+    //   this.isLaoding = false;
+    // },
+
     async launchAappLga() {
       this.isLaoding = true;
       this.mapType = "lgas";
+
+      // Add a guard clause for the map instance itself
+      if (!this.map) {
+        console.error("Map not initialized!");
+        this.isLaoding = false;
+        return;
+      }
+
       await this.fetchLgas();
-
-      this.selectedLga[this.view].length = 0;
-      this.lgas.forEach((l) => {
-        this.selectedLga[this.view].push(l.lga);
-      });
-
       await this.fetchLgaMapData();
-      // this.loadNationalMapGeometry();
-      this.mapGeoDataLga = {
-        type: "FeatureCollection",
-        features: [],
-      };
 
+      // Clean up previous layers
       if (this.lgasMapMarkers) {
         this.map.removeLayer(this.lgasMapMarkers);
       }
-      this.map.removeLayer(this.natonalMapMarkers);
-      this.lgasMapMarkers = L.layerGroup().addTo(this.map);
-
+      if (this.natonalMapMarkers) {
+        this.map.removeLayer(this.natonalMapMarkers);
+      }
       if (this.lgaGeoJson) {
         this.map.removeLayer(this.lgaGeoJson);
       }
 
-      this.lgas.forEach(async (d) => {
-        // let geoCords = JSON.parse(d.geometry);
-        this.mapGeoDataLga.features.push({
+      // Initialize new, empty layers
+      this.lgasMapMarkers = L.layerGroup().addTo(this.map);
+
+      const mapGeoDataLga = {
+        type: "FeatureCollection",
+        features: [],
+      };
+
+      for (const d of this.lgas) {
+        mapGeoDataLga.features.push({
           type: "Feature",
           id: `${d.state}-${d.lga}`,
           properties: {
@@ -927,12 +1031,10 @@ export const useMainStore = defineStore("useMainStore", {
           geometry: d.geometry,
         });
 
-        let st = d.state;
-        let lg = d.lga;
+        const st = d.state;
+        const lg = d.lga;
 
-        // if (this.selectedState[this.view].includes(st)) {
-        // let lgaFclts = this.facilities.filter((fc) => fc.state === st);
-        let lgaFclts = await this.getRandLgaFacilities(
+        const lgaFclts = await this.getRandLgaFacilities(
           st,
           lg,
           this.mapLgaData[this.view].length
@@ -944,52 +1046,48 @@ export const useMainStore = defineStore("useMainStore", {
           stIdx++
         ) {
           const mpData = this.mapLgaData[this.view][stIdx];
-          // console.log(mpData);
+
           if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
-            // let randomIndex = Math.floor(Math.random() * lgaFclts.length);
-            let randFacility = lgaFclts[stIdx];
+            // FIX 3: Add a guard clause for potentially undefined data
+            const randFacility = lgaFclts[stIdx];
+            if (randFacility && randFacility.geometry) {
+              const cords = [
+                randFacility.geometry.coordinates[1],
+                randFacility.geometry.coordinates[0],
+              ];
 
-            let cords = [
-              randFacility.geometry.coordinates[1],
-              randFacility.geometry.coordinates[0],
-            ];
+              const icon = L.divIcon({
+                className: "facilities-marker",
+                icData: mpData,
+                html: this.statusIconHTML(mpData.Status_of_support),
+                popupAnchor: [0, 200],
+              });
 
-            let mhtml = "";
-
-            let icon = L.divIcon({
-              className: "facilities-marker",
-              icData: mpData,
-              html: this.statusIconHTML(mpData.Status_of_support),
-              popupAnchor: [0, 200],
-            });
-
-            L.marker(cords, {
-              icon: icon,
-              autoPan: true,
-              autoPanOnFocus: true,
-            })
-              .addTo(this.lgasMapMarkers)
-              .on("click", this.markerEventNational);
+              L.marker(cords, { icon })
+                .addTo(this.lgasMapMarkers)
+                .on("click", this.markerEventNational);
+            }
           }
         }
-        // }
-      });
+      }
 
-      let mapContainerParent = this.mapContainerRef.parentNode;
-      let mapContainer = this.mapContainerRef;
-
-      mapContainerParent.removeChild(this.mapContainerRef);
-      mapContainerParent.appendChild(mapContainer);
-
-      this.lgaGeoJson = L.geoJson(this.mapGeoDataLga, {
+      // This code now runs AFTER the loop is completely finished.
+      this.lgaGeoJson = L.geoJson(mapGeoDataLga, {
         style: this.layerStyle,
         onEachFeature: this.onEachLGAsMapFeature,
       }).addTo(this.map);
 
-      // this.fitBounds(this.geoJson);
-      let lgasBounds = this.lgaGeoJson.getBounds();
-      this.map.fitBounds(lgasBounds);
-      this.map.setMaxBounds(lgasBounds);
+      // FIX 2: Remove the direct DOM manipulation.
+      // Instead, tell Leaflet to check its container size.
+      this.map.invalidateSize();
+
+      // The bounds will now be calculated correctly on the fully populated layer.
+      const lgasBounds = this.lgaGeoJson.getBounds();
+      if (lgasBounds.isValid()) {
+        this.map.fitBounds(lgasBounds);
+        this.map.setMaxBounds(lgasBounds);
+      }
+
       this.isLaoding = false;
     },
 
@@ -1290,6 +1388,18 @@ export const useMainStore = defineStore("useMainStore", {
       return null;
     },
 
+    addThematicAreas(areas) {
+      if (!this.thematicAreas) {
+        this.thematicAreas = [];
+      }
+
+      areas.forEach((area) => {
+        if (!this.thematicAreas.includes(area.area)) {
+          this.thematicAreas.push(area.area);
+        }
+      });
+    },
+
     async loadNationalMapGeometry() {
       this.mapGeoData = {
         type: "FeatureCollection",
@@ -1321,7 +1431,7 @@ export const useMainStore = defineStore("useMainStore", {
           stIdx++
         ) {
           const mpData = this.mapNationalData[this.view][stIdx];
-
+          this.addThematicAreas(mpData.Thematic_areas_supported);
           // if (
           //   !this.partners.some(
           //     (p) => p.partner == mpData.Name_of_Organization_Agency
@@ -1443,15 +1553,15 @@ export const useMainStore = defineStore("useMainStore", {
     async closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
-      if (this.mapType == "lgas") {
-        // this.selectedState[this.view].length = 0;
-        // this.states.forEach((s) => {
-        //   this.selectedState[this.view].push(s.state);
-        // });
-        // this.updateApp();
-        // this.loadNationalMapGeometry();
-        // await this.createNationalMap();
-      }
+      // if (this.mapType == "lgas") {
+      //   // this.selectedState[this.view].length = 0;
+      //   // this.states.forEach((s) => {
+      //   //   this.selectedState[this.view].push(s.state);
+      //   // });
+      //   // this.updateApp();
+      //   // this.loadNationalMapGeometry();
+      //   // await this.createNationalMap();
+      // }
 
       // if (this.viewingMap) {
       //   this.geoJson.resetStyle(this.viewingMap);
