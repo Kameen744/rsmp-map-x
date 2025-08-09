@@ -619,7 +619,7 @@ export const useMainStore = defineStore("useMainStore", {
     async fetchLgas() {
       let state = this.selectedState[this.view][0];
       let recName = `${state}-lgas`;
-      this.delLoc(recName);
+
       let lgs = await this.getLoc(recName);
 
       if (lgs) {
@@ -1432,16 +1432,23 @@ export const useMainStore = defineStore("useMainStore", {
 
     //   return points;
     // },
-
+    async backToStatesData() {
+      this.selectedState[this.view].length = 0;
+      this.states.forEach((s) => {
+        this.selectedState[this.view].push(s.state);
+      });
+      this.mapType = "states";
+      this.updateApp();
+    },
     async closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
       if (this.mapType == "lgas") {
-        this.selectedState[this.view].length = 0;
-        this.states.forEach((s) => {
-          this.selectedState[this.view].push(s.state);
-        });
-        this.updateApp();
+        // this.selectedState[this.view].length = 0;
+        // this.states.forEach((s) => {
+        //   this.selectedState[this.view].push(s.state);
+        // });
+        // this.updateApp();
         // this.loadNationalMapGeometry();
         // await this.createNationalMap();
       }

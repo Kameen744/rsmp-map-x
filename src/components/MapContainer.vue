@@ -6,13 +6,42 @@
     >
     </div>
     <div class="absolute top-[10px] left-[80px] z-[991] bg-transparent">
-      <div
-        v-if="currentSupports[view]"
-        class="font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]"
-        @click="showSupportTypes = !showSupportTypes"
-      >
-        <h6 class="p-0 m-0">KEY</h6>
+      <div class="flex">
+        <div
+          v-if="currentSupports[view]"
+          class="font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]"
+          @click="showSupportTypes = !showSupportTypes"
+        >
+          <h6 class="p-0 m-0">KEY</h6>
+        </div>
+        <div
+          v-if="mapType == 'lgas'"
+          class="font-bold text-[15px] ml-2 p-2 shadow bg-white rounded cursor-pointer max-w-[70px]"
+          @click="store.backToStatesData"
+        >
+          <div class="flex p-0 m-0">
+            <svg
+              class="w-6 h-6 text-gray-800"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m15 19-7-7 7-7"
+              />
+            </svg>
+            <div> Back</div>
+          </div>
+        </div>
       </div>
+
       <div
         v-if="showSupportTypes"
         class="bg-white font-bold text-[15px] shadow max-w-[75vw] overflow-auto mt-2"
