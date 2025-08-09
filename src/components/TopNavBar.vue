@@ -87,6 +87,19 @@ const store = useMainStore();
 const router = useRouter();
 const logginOut = ref(false);
 
+const {
+  selectedState,
+  selectedLga,
+  selectedPrograms,
+  selectedStatus,
+  selectedPartners,
+  selectedSupports,
+  selectedThematicAreas,
+  mapData,
+  view,
+  cso,
+} = storeToRefs(store);
+
 const links = [
   { name: "map", title: "Map View" },
   { name: "ptins", title: "Support Summary" },
@@ -96,22 +109,25 @@ const links = [
 
 const changeView = async (v) => {
   view.value = v;
-  selectedState.value[v] = "Niger";
-  selectedLga.value[v] = "";
-  selectedPartners.value[v] = [];
-  selectedSupports.value[v] = [];
-  selectedStatus.value[v] = ["Ongoing"];
+  selectedState.value[view.value] = [];
+  selectedLga.value[view.value] = [];
+  selectedPrograms.value[view.value] = [];
+  selectedPartners.value[view.value] = [];
+  selectedSupports.value[view.value] = [];
+  selectedStatus.value[view.value] = [];
+  selectedThematicAreas.value[view.value] = [];
 
-  if (v == "map" || v == "ptins") {
-    selectedPrograms.value[v] = ["Routine Immunization"];
-  } else {
-    if (v == "cso") {
-      cso.value = "only";
-    } else {
-      cso.value = "non";
-    }
-    selectedPrograms.value[v] = [];
-  }
+  // if (v == "map" || v == "ptins") {
+  //   selectedPrograms.value[v] = ["Routine Immunization"];
+  // } else {
+  //   if (v == "cso") {
+  //     cso.value = "only";
+  //   } else {
+  //     cso.value = "non";
+  //   }
+  //   selectedPrograms.value[v] = [];
+  // }
+
   store.closePopup();
   await store.updateApp();
 };
@@ -122,18 +138,6 @@ const logout = async () => {
   router.push({ name: "login" });
   logginOut.value = !logginOut.value;
 };
-
-const {
-  selectedState,
-  selectedLga,
-  selectedPrograms,
-  selectedStatus,
-  selectedPartners,
-  selectedSupports,
-  mapData,
-  view,
-  cso,
-} = storeToRefs(store);
 </script>
 <style scoped>
 .map-btn {

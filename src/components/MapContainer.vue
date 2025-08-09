@@ -7,14 +7,21 @@
     </div>
     <div class="absolute top-[10px] left-[80px] z-[991] bg-transparent">
       <div class="flex">
-        <div
+        <button
           v-if="currentSupports[view]"
           class="font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]"
           @click="showSupportTypes = !showSupportTypes"
         >
           <h6 class="p-0 m-0">KEY</h6>
-        </div>
-        <div
+        </button>
+        <button
+          v-if="currentSupports[view]"
+          class="font-bold text-[15px] ml-2 p-2 shadow bg-white rounded cursor-pointer max-w-[150px]"
+          @click="showNationalData = !showNationalData"
+        >
+          <h6 class="p-0 m-0">National Data</h6>
+        </button>
+        <button
           v-if="mapType == 'lgas'"
           class="font-bold text-[15px] ml-2 p-2 shadow bg-white rounded cursor-pointer max-w-[70px]"
           @click="store.backToStatesData"
@@ -39,7 +46,7 @@
             </svg>
             <div> Back</div>
           </div>
-        </div>
+        </button>
       </div>
 
       <div
@@ -78,6 +85,13 @@
           </div>
         </div>
       </div>
+      <!-- show National data -->
+      <div
+        v-if="showNationalData"
+        class="bg-white font-bold text-[15px] shadow max-w-[75vw] overflow-auto mt-2"
+      >
+        <NationalDataShow></NationalDataShow>
+      </div>
     </div>
     <MarkerPopup v-if="selectedLgaMarker || selectedMarker"></MarkerPopup>
   </div>
@@ -88,9 +102,11 @@ import { useMainStore } from "./../storage/store";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 import MarkerPopup from "./MarkerPopup.vue";
+import NationalDataShow from "./NationalDataShow.vue";
 
 const store = useMainStore();
 const showSupportTypes = ref(false);
+const showNationalData = ref(false);
 const {
   mapContainerRef,
   selectedLgaMarker,

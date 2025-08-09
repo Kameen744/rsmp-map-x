@@ -84,7 +84,8 @@ import CloseIcon from "./CloseIcon.vue";
 
 const store = useMainStore();
 
-const { selectedState, selectedLga, view, states } = storeToRefs(store);
+const { selectedState, selectedLga, view, states, mapType } =
+  storeToRefs(store);
 
 const dropped = ref(false);
 
@@ -127,13 +128,13 @@ const SelectState = async (state) => {
 };
 
 const selectAllStates = async () => {
+  mapType.value = "states";
   if (selectedState.value[view.value].length < states.value.length) {
     selectedState.value[view.value] = [];
     for (let i = 0; i < states.value.length; i++) {
       selectedState.value[view.value].push(states.value[i].state);
     }
     // store.launchAapp();
-
     store.updateApp();
   } else {
     selectedState.value[view.value] = [];

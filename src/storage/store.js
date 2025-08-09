@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import Chart from "chart.js/auto";
 import axios from "axios";
 import { marker, tooltip } from "leaflet";
-import { toRaw } from "vue";
+import { capitalize, toRaw } from "vue";
 import * as localForage from "localforage";
 import PocketBase from "pocketbase";
 const pbUrl = "https://pb-api.resourcetrackr.com";
@@ -76,6 +76,7 @@ export const useMainStore = defineStore("useMainStore", {
     selectedThematicAreas: {},
     selectedStartDate: "2020-01-01",
     selectedEndDate: "2030-12-31",
+    nationalMapDataToShow: [],
   }),
 
   actions: {
@@ -491,10 +492,10 @@ export const useMainStore = defineStore("useMainStore", {
       };
     },
 
-    fetch(url) {
-      this.isLaoding = true;
-      return axios.get(`${this.baseUrl}.${url}`);
-    },
+    // fetch(url) {
+    //   this.isLaoding = true;
+    //   return axios.get(`${this.baseUrl}.${url}`);
+    // },
 
     // setLoc(key, val) {
     //   val = JSON.stringify(val);
@@ -992,7 +993,7 @@ export const useMainStore = defineStore("useMainStore", {
     async launchAappLga() {
       this.isLaoding = true;
       this.mapType = "lgas";
-
+      this.nationalMapDataToShow = [];
       // Add a guard clause for the map instance itself
       if (!this.map) {
         console.error("Map not initialized!");
@@ -1048,7 +1049,9 @@ export const useMainStore = defineStore("useMainStore", {
           stIdx++
         ) {
           const mpData = this.mapLgaData[this.view][stIdx];
-
+          if (mpData.Level_of_support == "National") {
+            this.nationalMapDataToShow.push(mpData);
+          }
           if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
             // FIX 3: Add a guard clause for potentially undefined data
             const randFacility = lgaFclts[stIdx];
@@ -1097,24 +1100,143 @@ export const useMainStore = defineStore("useMainStore", {
       this.isLaoding = true;
       // await this.fetchMapData();
       if (this.view == "map") {
-        // await this.mapMarkers.clearLayers();
-        // await this.markerGeoJson.clearLayers();
-        // await this.geoJson.clearLayers();
-        // if (this.mapType == "states") {
-
+        if (this.mapType == "states") {
+          await this.fetchNationalMapData();
+          await this.loadNationalMapGeometry();
+          await this.createNationalMap();
+        } else {
+          await this.launchAappLga();
+        }
+      } else if (this.view == "ptins") {
         await this.fetchNationalMapData();
-        await this.loadNationalMapGeometry();
-        // await this.createMap();
-        await this.createNationalMap();
-        // this.isLaoding =false;
-        // } else {
-        //   await this.fetchMapData();
-        //   await this.loadGeoData();
-        //   await this.createMap();
-        // }
-        // await this.geoJson.addData(this.mapGeoData);
-        // await this.createDataPoints();
+        const that = this;
+        let partnerSummaryData = {};
+        const insData = this.mapNationalData[this.view];
+        for (let i = 0; i < insData.length; i++) {
+          let dObj = insData[i];
+
+          // arrange data by 'dObj.Name_of_Organization_Agency'?
+
+          // if (!partnerSummaryData[dObj.Campaign_Focus_Other]) {
+          //   partnerSummaryData[dObj.Campaign_Focus_Other] = {};
+
+          //   partnerSummaryData[dObj.Campaign_Focus_Other][]
+          // }
+
+          // dObj.Campaign_Focus.forEach((campaign) => {
+          //   if (!partnerSummaryData[campaign]) {
+          //     partnerSummaryData[campaign] = {};
+          //   }
+          // });
+
+          console.log(dObj);
+          // Object.keys(insData[st]).forEach((lg) => {
+          //   insData[st][lg].forEach((progData) => {
+          //     let prgArea = progData.program_area;
+          //     let partner = progData.partner;
+          //     if (!partnerSummaryData[prgArea]) {
+          //       partnerSummaryData[prgArea] = {};
+          //     }
+          //     if (!partnerSummaryData[prgArea][partner]) {
+          //       partnerSummaryData[prgArea][partner] = [];
+          //     }
+          //     let hasSupport = partnerSummaryData[prgArea][partner].some(
+          //       (obj) => obj.type_of_support === progData.type_of_support
+          //     );
+          //     if (!hasSupport) {
+          //       partnerSummaryData[prgArea][partner].push(progData);
+          //     }
+          //   });
+          // });
+        }
+        // Object.keys(insData).forEach((st) => {
+        //   console.log(st);
+
+        // });
+
+        that.partnerSummaryData = partnerSummaryData;
       }
+
+      // {
+      //     "Are_you_collaborating_with_any_other_partners": "Yes",
+      //     "Campaign_Focus": [
+      //         "Measles Rubella"
+      //     ],
+      //     "Campaign_Focus_Other": "",
+      //     "Designation_of_respondent": "Communications Lead",
+      //     "Email_Address_of_Respondent": "ndidi.c@c-wins.org",
+      //     "End_date_of_support": "2025-12-31 00:00:00.000Z",
+      //     "Key_Performance_Indicators": "",
+      //     "LGA_supported": [
+      //         {
+      //             "lga": "Ibiono Ibom",
+      //             "state": "Akwa Ibom"
+      //         }
+      //     ],
+      //     "Level_of_support": [
+      //         "National",
+      //         "State"
+      //     ],
+      //     "List_the_Partners": [
+      //         "IVAC",
+      //         "UNICEF",
+      //         "AFENET"
+      //     ],
+      //     "Name_of_Organization_Agency": "Centre for Well-being and Integrated Nutrition Solutions",
+      //     "Name_of_Respondent": "Ndidichukwu Odoh",
+      //     "Phone_Number_of_Respondent": "08057033414",
+      //     "Start_date_of_support": "2024-11-05 00:00:00.000Z",
+      //     "States_supported": [
+      //         {
+      //             "state": "Cross River"
+      //         },
+      //     ],
+      //     "Status_of_support": "In Progress",
+      //     "Summary_of_Support": "The Centre for Well-being and Integrated Nutrition Solutions roader health goals and aligns with the global Immunization Agenda 2030 by addressing zero-dose burdens and improving health system resilience.",
+      //     "Thematic_areas_supported": [
+      //         {
+      //             "area": "ACSM",
+      //             "kpi": "MR vaccine introduced in Q4 2025 with 95% campaign coverage.   National MCV1 and MCV2 routine coverage rates improve quarterly from introduction.",
+      //             "sub_areas": [
+      //                 "Program Advocacy"
+      //             ],
+      //             "support_level": [
+      //                 "National",
+      //                 "States",
+      //                 "LGAs"
+      //             ]
+      //         },
+      //         {
+      //             "area": "MERLA (Monitoring, Evaluation, Research, Learning and Accountability)",
+      //             "kpi": "Permedia influencer posts.  Proportion of states with acceptable admin-survey coverage gap post-campaign.",
+      //             "sub_areas": [
+      //                 "Knowledge management and learning"
+      //             ],
+      //             "support_level": [
+      //                 "National",
+      //                 "States",
+      //                 "LGAs"
+      //             ]
+      //         }
+      //     ],
+      //     "Type_of_Organization_Agency": [
+      //         "Implementing Partner"
+      //     ],
+      //     "Type_of_Support": [
+      //         {
+      //             "deployment_states": [
+      //                 {
+      //                     "state": "Cross River"
+      //                 },
+
+      //             ],
+      //             "number_of_personnel": 6,
+      //             "personnel_deployed": true,
+      //             "support_type": "Technical Support"
+      //         }
+      //     ],
+      //     "Who_is_the_Funder_of_your_project": "Gates Foundation"
+      // }
 
       // else if (this.view == "chart") {
       //   // this.selectedPrograms = null;
@@ -1355,7 +1477,8 @@ export const useMainStore = defineStore("useMainStore", {
       this.selectedState[this.view].length = 0;
       this.selectedState[this.view].push(dataSet.state);
       // console.log(this.selectedState[this.view]);
-      this.launchAappLga();
+      await this.launchAappLga();
+      // this.isLaoding = false;
       // this.map.flyToBounds(e.target, { duration: 0.2 }, 24);
     },
 
@@ -1403,6 +1526,7 @@ export const useMainStore = defineStore("useMainStore", {
     },
 
     async loadNationalMapGeometry() {
+      this.nationalMapDataToShow = [];
       this.mapGeoData = {
         type: "FeatureCollection",
         features: [],
@@ -1433,6 +1557,9 @@ export const useMainStore = defineStore("useMainStore", {
           stIdx++
         ) {
           const mpData = this.mapNationalData[this.view][stIdx];
+          if (mpData.Level_of_support == "National") {
+            this.nationalMapDataToShow.push(mpData);
+          }
           this.addThematicAreas(mpData.Thematic_areas_supported);
           // if (
           //   !this.partners.some(
@@ -1546,9 +1673,9 @@ export const useMainStore = defineStore("useMainStore", {
     // },
     async backToStatesData() {
       this.selectedState[this.view].length = 0;
-      this.states.forEach((s) => {
-        this.selectedState[this.view].push(s.state);
-      });
+      // this.states.forEach((s) => {
+      //   this.selectedState[this.view].push(s.state);
+      // });
       this.mapType = "states";
       this.updateApp();
     },

@@ -82,7 +82,8 @@ import CheckIcon from "./CheckIcon.vue";
 import CloseIcon from "./CloseIcon.vue";
 
 const store = useMainStore();
-const { selectedPartners, view, partners, selected } = storeToRefs(store);
+const { selectedPartners, view, partners, selected, isLaoding } =
+  storeToRefs(store);
 
 const filterPartners = (pt) => {
   if (view.value == "chart" && pt.cso_partner == "1") {
@@ -91,7 +92,7 @@ const filterPartners = (pt) => {
   return true;
 };
 
-const SelectPartner = (partner) => {
+const SelectPartner = async (partner) => {
   let spt = selectedPartners.value[view.value];
   if (spt.length == partners.value.length) {
     selectedPartners.value[view.value] = [];
@@ -107,7 +108,7 @@ const SelectPartner = (partner) => {
   }
 
   // console.log(selectedPartners.value[view.value]);
-  store.updateApp();
+  await store.updateApp();
 };
 
 const selectAllPartners = async () => {
@@ -120,6 +121,6 @@ const selectAllPartners = async () => {
     selectedPartners.value[view.value] = [];
   }
 
-  store.updateApp();
+  await store.updateApp();
 };
 </script>

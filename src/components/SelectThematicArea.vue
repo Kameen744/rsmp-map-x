@@ -101,7 +101,7 @@ const sortedThematicAreas = computed(() => {
   return [...thematicAreas.value].sort((a, b) => a.localeCompare(b));
 });
 
-const selectThemArea = async (area) => {
+const selectThemArea = (area) => {
   let sspt = selectedThematicAreas.value[view.value];
   if (!sspt.includes(area)) {
     selectedThematicAreas.value[view.value].push(area);
