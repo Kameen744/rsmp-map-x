@@ -4,6 +4,7 @@
       <ul class="menu menu-horizontal flex p-0 py-2 justify-start">
         <SelectState></SelectState>
         <!-- <SelectLga></SelectLga> -->
+        <SelectThematicArea></SelectThematicArea>
         <SelectPartner></SelectPartner>
         <SelectProgram></SelectProgram>
         <SelectSupport></SelectSupport>
@@ -22,6 +23,7 @@ import SelectProgram from "./SelectProgram.vue";
 import SelectPartner from "./SelectPartner.vue";
 import SelectSupport from "./SelectSupport.vue";
 import SelectStatus from "./SelectStatus.vue";
+import SelectThematicArea from "./SelectThematicArea.vue";
 // import selectStartDate from './selectStartDate.vue';
 // import selectEndDate from './selectEndDate.vue';
 

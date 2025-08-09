@@ -63,6 +63,7 @@ const {
   statusContRef,
   selectedPartners,
   selectedSupports,
+  selectedThematicAreas,
   chartCleanedData,
   view,
   selectedStatus,
@@ -79,6 +80,7 @@ onMounted(() => {
   selectedPartners.value[view.value] = [];
   selectedSupports.value[view.value] = [];
   selectedStatus.value[view.value] = [];
+  selectedThematicAreas.value[view.value] = [];
   // selectedStatus.value[view.value] = ["Ongoing"];
   // "AFENET", "McKinsey", "UNICEF", "WHO"
   ready.value = true;

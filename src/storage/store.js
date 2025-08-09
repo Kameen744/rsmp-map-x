@@ -771,6 +771,7 @@ export const useMainStore = defineStore("useMainStore", {
         partner: toRaw(this.selectedPartners[this.view]),
         supportFocus: toRaw(this.selectedPrograms[this.view]),
         suportType: toRaw(this.selectedSupports[this.view]),
+        thematicArea: toRaw(this.selectedThematicAreas[this.view]),
         status: toRaw(this.selectedStatus[this.view]),
       };
 
@@ -787,6 +788,7 @@ export const useMainStore = defineStore("useMainStore", {
         partner: toRaw(this.selectedPartners[this.view]),
         supportFocus: toRaw(this.selectedPrograms[this.view]),
         suportType: toRaw(this.selectedSupports[this.view]),
+        thematicArea: toRaw(this.selectedThematicAreas[this.view]),
         status: toRaw(this.selectedStatus[this.view]),
       };
 
