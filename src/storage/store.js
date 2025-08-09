@@ -993,7 +993,7 @@ export const useMainStore = defineStore("useMainStore", {
     async launchAappLga() {
       this.isLaoding = true;
       this.mapType = "lgas";
-      this.nationalMapDataToShow = [];
+      // this.nationalMapDataToShow = [];
       // Add a guard clause for the map instance itself
       if (!this.map) {
         console.error("Map not initialized!");
@@ -1049,9 +1049,9 @@ export const useMainStore = defineStore("useMainStore", {
           stIdx++
         ) {
           const mpData = this.mapLgaData[this.view][stIdx];
-          if (mpData.Level_of_support == "National") {
-            this.nationalMapDataToShow.push(mpData);
-          }
+          // if (mpData.Level_of_support == "National") {
+          //   this.nationalMapDataToShow.push(mpData);
+          // }
           if (mpData.LGA_supported.some((lgaObj) => lgaObj.lga === lg)) {
             // FIX 3: Add a guard clause for potentially undefined data
             const randFacility = lgaFclts[stIdx];
