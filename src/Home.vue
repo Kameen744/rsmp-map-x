@@ -7,18 +7,20 @@
       :class="view == 'map' ? '' : 'pt-2'"
       v-on:scroll="store.scrollDataContainer"
     >
-      <StatusContainer
+      <!-- <StatusContainer
         :key="chartCleanedData"
         v-if="view == 'chart'"
-      ></StatusContainer>
+      ></StatusContainer> -->
       <MapContainer v-show="view == 'map'"></MapContainer>
+      <PartnerInsContainer v-if="view == 'ptins'"></PartnerInsContainer>
+      <DashboardView v-if="view == 'dashboard'"></DashboardView>
+      <!-- <DashboardViewSec v-if="view == 'dashboard'"></DashboardViewSec> -->
       <!-- <TestMap v-show="view == 'map'"></TestMap> -->
       <!-- <MapContainerLga
         v-show="view == 'map' && mapType == 'lgas'"
       ></MapContainerLga> -->
-      <PartnerContainer v-if="view == 'chart'"></PartnerContainer>
-      <CsoContainer v-if="view == 'cso'"></CsoContainer>
-      <PartnerInsContainer v-if="view == 'ptins'"></PartnerInsContainer>
+      <!-- <PartnerContainer v-if="view == 'chart'"></PartnerContainer> -->
+      <!-- <CsoContainer v-if="view == 'cso'"></CsoContainer> -->
     </div>
   </template>
 </template>
@@ -31,10 +33,12 @@ import TopNavBar from "./components/TopNavBar.vue";
 import FiltersContainer from "./components/FiltersContainer.vue";
 import StatusContainer from "./components/StatusContainer.vue";
 import MapContainer from "./components/MapContainer.vue";
-import PartnerContainer from "./components/PartnerContainer.vue";
-import CsoContainer from "./components/CsoContainer.vue";
+// import PartnerContainer from "./components/PartnerContainer.vue";
+// import CsoContainer from "./components/CsoContainer.vue";
 import PartnerInsContainer from "./components/PartnerInsContainer.vue";
-import MapContainerLga from "./components/MapContainerLga.vue";
+import DashboardView from "./components/DashboardView.vue";
+import DashboardViewSec from "./components/DashboardViewSec.vue";
+// import MapContainerLga from "./components/MapContainerLga.vue";
 // import TestMap from "./components/TestMap.vue";
 
 import "vue-loading-overlay/dist/css/index.css";

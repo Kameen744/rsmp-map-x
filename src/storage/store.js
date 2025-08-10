@@ -1108,9 +1108,18 @@ export const useMainStore = defineStore("useMainStore", {
           await this.launchAappLga();
         }
       } else if (this.view == "ptins") {
-        await this.fetchNationalMapData();
+        let insData = [];
+        if (this.mapType == "states") {
+          await this.fetchNationalMapData();
+          insData = this.mapNationalData[this.view];
+        } else if (this.mapType == "lgas") {
+          await this.fetchLgaMapData();
+          insData = this.mapLgaData[this.view];
+        }
+
         const that = this;
         let partnerSummaryData = {};
+
         let addToSumData = (cFocus, orgAgency, dObj) => {
           if (
             orgAgency ==
@@ -1149,11 +1158,9 @@ export const useMainStore = defineStore("useMainStore", {
             }
           }
         };
-        const insData = this.mapNationalData[this.view];
+
         for (let i = 0; i < insData.length; i++) {
           let dObj = insData[i];
-
-          // arrange data by 'dObj.Name_of_Organization_Agency'?
           addToSumData(
             dObj.Campaign_Focus_Other,
             dObj.Name_of_Organization_Agency,
@@ -1166,6 +1173,8 @@ export const useMainStore = defineStore("useMainStore", {
         }
 
         that.partnerSummaryData = partnerSummaryData;
+      } else if (this.view == "dashboard") {
+        console.log("dashboard view");
       }
 
       // Object.keys(insData[st]).forEach((lg) => {

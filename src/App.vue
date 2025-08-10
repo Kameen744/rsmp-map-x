@@ -7,7 +7,7 @@
     :z-index="99999999999"
     color="#1F3559"
   />
-  <LoaderContainer></LoaderContainer>
+  <!-- <LoaderContainer></LoaderContainer> -->
   <router-view></router-view>
 </template>
 

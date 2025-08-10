@@ -37,9 +37,9 @@
 
           <li>
             <button
-              @click.prevent="changeView('chart')"
-              class="map-btn"
-              :class="view == 'chart' ? 'bg-rsmp-active-btn' : ''"
+              @click.prevent="changeView('dashboard')"
+              class="map-btn mr-4"
+              :class="view == 'dashboard' ? 'bg-rsmp-active-btn' : ''"
             >
               Dashboard
             </button>
