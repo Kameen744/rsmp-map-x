@@ -122,9 +122,13 @@ const SelectState = async (state) => {
 
   selectedState.value[view.value] = [];
   selectedState.value[view.value].push(state.state);
-  store.launchAappLga();
+  if (view.value != "map") {
+    store.updateApp();
+  } else {
+    store.launchAappLga();
+  }
   // console.log(selectedState.value[view.value]);
-  // store.updateApp();
+  //
 };
 
 const selectAllStates = async () => {

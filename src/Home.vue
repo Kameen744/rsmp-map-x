@@ -13,7 +13,10 @@
       ></StatusContainer> -->
       <MapContainer v-show="view == 'map'"></MapContainer>
       <PartnerInsContainer v-if="view == 'ptins'"></PartnerInsContainer>
-      <DashboardView v-if="view == 'dashboard'"></DashboardView>
+      <DashboardView
+        v-if="view == 'dashboard' && chartDataLoaded"
+        :key="chartDataLoaded"
+      ></DashboardView>
       <!-- <DashboardViewSec v-if="view == 'dashboard'"></DashboardViewSec> -->
       <!-- <TestMap v-show="view == 'map'"></TestMap> -->
       <!-- <MapContainerLga
@@ -59,6 +62,7 @@ const {
   selectedStatus,
   mapType,
   isLaoding,
+  chartDataLoaded,
 } = storeToRefs(store);
 
 onMounted(() => {

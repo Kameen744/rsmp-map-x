@@ -4,6 +4,7 @@ import axios from "axios";
 import { marker, tooltip } from "leaflet";
 import { capitalize, toRaw } from "vue";
 import * as localForage from "localforage";
+// import * as Chart from "chart.js";
 import PocketBase from "pocketbase";
 const pbUrl = "https://pb-api.resourcetrackr.com";
 const pb = new PocketBase(pbUrl);
@@ -32,6 +33,7 @@ export const useMainStore = defineStore("useMainStore", {
     cso: "all",
     mapData: {},
     mapNationalData: {},
+    dashboardData: {},
     mapLgaData: {},
     chartData: null,
     partnerSummaryData: {},
@@ -46,11 +48,8 @@ export const useMainStore = defineStore("useMainStore", {
     baseUrl:
       "https://demo-resourcemapping-85.9.203.7.nip.io/api/method/resourcemapping.data",
     apiMethod: "",
-    // mapContainerRefMain: null,
     mapContainerRef: null,
     mapContainerLGARef: null,
-    // mapKeyRef: null,
-    // mapKeyContentRef: null,
     geoJson: null,
     lgaGeoJson: null,
     markerGeoJson: null,
@@ -77,6 +76,64 @@ export const useMainStore = defineStore("useMainStore", {
     selectedStartDate: "2020-01-01",
     selectedEndDate: "2030-12-31",
     nationalMapDataToShow: [],
+    dashboardStats: [
+      { label: "States Supported", value: 0, color: "text-teal-500" },
+      { label: "LGAs Supported", value: 0, color: "text-teal-500" },
+      { label: "Partners", value: 0, color: "text-teal-500" },
+      { label: "Campaign Focus", value: 0, color: "text-teal-500" },
+      { label: "Thematic Areas", value: 0, color: "text-teal-500" },
+    ],
+
+    chartDataLoaded: null,
+
+    campaignBarChartRef: null,
+    campaignBarChartData: {
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: "#86198f",
+          borderRadius: 2,
+        },
+      ],
+    },
+
+    thematicLineChartRef: null,
+    thematicLineChartData: {
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: "#86198f",
+          borderRadius: 2,
+        },
+      ],
+    },
+
+    statusDoughnutRef: null,
+    statusDoughnutData: {
+      labels: ["Pending", "Ongoing", "Completed"],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: ["#dc2626", "#64748b", "#16a34a"],
+          borderWidth: 0,
+          cutout: "60%",
+        },
+      ],
+    },
+
+    supportTypesPieChartRef: null,
+    supportTypesPieData: {
+      labels: ["Provision of Commodities", "Technical Support", "Funding"],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: ["#134e4a", "#5eead4", "#14b8a6"],
+          borderWidth: 0,
+        },
+      ],
+    },
   }),
 
   actions: {
@@ -1096,6 +1153,102 @@ export const useMainStore = defineStore("useMainStore", {
       this.isLaoding = false;
     },
 
+    createCampaignFocusChart() {
+      new Chart(this.campaignBarChartRef, {
+        type: "bar",
+        data: this.campaignBarChartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              // max: 40,
+              grid: {
+                display: true,
+                color: "#e5e7eb",
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                maxRotation: 45,
+                minRotation: 45,
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+        },
+      });
+
+      new Chart(this.thematicLineChartRef, {
+        type: "line",
+        data: this.thematicLineChartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              // max: 40,
+              grid: {
+                display: true,
+                color: "#e5e7eb",
+              },
+            },
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                maxRotation: 45,
+                minRotation: 45,
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+        },
+      });
+
+      new Chart(this.statusDoughnutRef, {
+        type: "doughnut",
+        data: this.statusDoughnutData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+        },
+      });
+
+      new Chart(this.supportTypesPieChartRef, {
+        type: "pie",
+        data: this.supportTypesPieData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+        },
+      });
+    },
+
     async updateApp() {
       this.isLaoding = true;
       // await this.fetchMapData();
@@ -1174,149 +1327,188 @@ export const useMainStore = defineStore("useMainStore", {
 
         that.partnerSummaryData = partnerSummaryData;
       } else if (this.view == "dashboard") {
-        console.log("dashboard view");
+        let insData = [];
+        if (this.mapType == "states") {
+          await this.fetchNationalMapData();
+          insData = this.mapNationalData[this.view];
+          // console.log("states: ", insData.length);
+        } else if (this.mapType == "lgas") {
+          await this.fetchLgaMapData();
+          insData = this.mapLgaData[this.view];
+          // console.log("lgas: ", insData.length);
+        }
+        // console.log(insData);
+        // console.log(insData);
+        // dashboardStats = 0=states,1=lgas,2=partners,3=campaign_focus,4=thematic_areas
+        let st_spt = []; //states_supported
+        let lg_spt = [];
+        let partns = [];
+        let cmpfcs = [];
+        let thematic = [];
+        let statusCompleted = 0;
+        let statusOngoing = 0;
+        let statusPending = 0;
+        let ProvisionofCommodities = 0;
+        let TechnicalSupport = 0;
+        let Funding = 0;
+
+        // "Provision of Commodities", "Technical Support", "Funding"
+
+        this.campaignBarChartData.datasets[0].data = [];
+        this.thematicLineChartData.datasets[0].data = [];
+
+        for (let i = 0; i < insData.length; i++) {
+          let dObj = insData[i];
+
+          if (dObj.Status_of_support == "In Progress") {
+            statusOngoing += 1;
+          } else if (dObj.Status_of_support == "Pending") {
+            statusPending += 1;
+          } else if (dObj.Status_of_support == "Completed") {
+            statusCompleted += 1;
+          }
+
+          if (
+            dObj.Type_of_Support.some(
+              (spt) => spt.support_type == "Provision of Commodities"
+            )
+          ) {
+            ProvisionofCommodities += 1;
+          }
+
+          if (
+            dObj.Type_of_Support.some(
+              (spt) => spt.support_type == "Technical Support"
+            )
+          ) {
+            TechnicalSupport += 1;
+          }
+
+          if (
+            dObj.Type_of_Support.some((spt) => spt.support_type == "Funding")
+          ) {
+            Funding += 1;
+          }
+
+          dObj.States_supported.forEach((st) => {
+            if (!st_spt.includes(st.state)) {
+              st_spt.push(st.state);
+            }
+          });
+          dObj.LGA_supported.forEach((lg) => {
+            if (!lg_spt.includes(lg.lga)) {
+              lg_spt.push(lg.lga);
+            }
+          });
+          dObj.List_the_Partners.forEach((pat) => {
+            if (!partns.includes(pat)) {
+              partns.push(pat);
+            }
+          });
+
+          // This is for other focus areas
+
+          // if (dObj.Campaign_Focus_Other && dObj.Campaign_Focus_Other != "") {
+          //   if (!cmpfcs.includes(dObj.Campaign_Focus_Other)) {
+          //     if (!dObj.Campaign_Focus_Other.includes("etc")) {
+          //       cmpfcs.push(dObj.Campaign_Focus_Other);
+          //     }
+          //   }
+          // }
+
+          dObj.Campaign_Focus.forEach((campaign) => {
+            if (!cmpfcs.includes(campaign)) {
+              cmpfcs.push(campaign);
+            }
+          });
+
+          dObj.Thematic_areas_supported.forEach((them) => {
+            if (!thematic.includes(them.area)) {
+              thematic.push(them.area);
+            }
+          });
+
+          for (let cIdx = 0; cIdx < cmpfcs.length; cIdx++) {
+            const cmp = cmpfcs[cIdx];
+            if (dObj.Campaign_Focus.includes(cmp)) {
+              if (!this.campaignBarChartData.datasets[0].data[cIdx]) {
+                this.campaignBarChartData.datasets[0].data[cIdx] = 1;
+              } else {
+                this.campaignBarChartData.datasets[0].data[cIdx] += 1;
+              }
+            }
+          }
+
+          for (let tIdx = 0; tIdx < thematic.length; tIdx++) {
+            const them = thematic[tIdx];
+            if (dObj.Thematic_areas_supported.some((tm) => tm.area == them)) {
+              if (!this.thematicLineChartData.datasets[0].data[tIdx]) {
+                this.thematicLineChartData.datasets[0].data[tIdx] = 1;
+              } else {
+                this.thematicLineChartData.datasets[0].data[tIdx] += 1;
+              }
+            }
+          }
+        }
+
+        this.dashboardStats[0].value = st_spt.length;
+        this.dashboardStats[1].value = lg_spt.length;
+        this.dashboardStats[2].value = partns.length;
+        this.dashboardStats[3].value = cmpfcs.length;
+        this.dashboardStats[4].value = thematic.length;
+
+        this.campaignBarChartData.labels = cmpfcs;
+        this.thematicLineChartData.labels = thematic;
+
+        if (statusCompleted > 0) {
+          statusCompleted = ((statusCompleted / insData.length) * 100).toFixed(
+            2
+          );
+        }
+
+        if (statusOngoing > 0) {
+          statusOngoing = ((statusOngoing / insData.length) * 100).toFixed(2);
+        }
+
+        if (statusPending > 0) {
+          statusPending = ((statusPending / insData.length) * 100).toFixed(2);
+        }
+
+        if (ProvisionofCommodities > 0) {
+          ProvisionofCommodities = (
+            (ProvisionofCommodities / insData.length) *
+            100
+          ).toFixed(2);
+        }
+
+        if (statusPending > 0) {
+          TechnicalSupport = (
+            (TechnicalSupport / insData.length) *
+            100
+          ).toFixed(2);
+        }
+
+        if (Funding > 0) {
+          Funding = ((Funding / insData.length) * 100).toFixed(2);
+        }
+
+        // console.log([statusPending, statusOngoing, statusCompleted]);
+        this.statusDoughnutData.datasets[0].data = [
+          statusPending,
+          statusOngoing,
+          statusCompleted,
+        ];
+
+        // this is different because on support type can be on every data set
+        this.supportTypesPieData.datasets[0].data = [
+          ProvisionofCommodities,
+          TechnicalSupport,
+          Funding,
+        ];
+
+        this.chartDataLoaded = Math.random() * 8;
+        // this.createCampaignFocusChart();
       }
-
-      // Object.keys(insData[st]).forEach((lg) => {
-      //   insData[st][lg].forEach((progData) => {
-      //     let prgArea = progData.program_area;
-      //     let partner = progData.partner;
-      //     if (!partnerSummaryData[prgArea]) {
-      //       partnerSummaryData[prgArea] = {};
-      //     }
-      //     if (!partnerSummaryData[prgArea][partner]) {
-      //       partnerSummaryData[prgArea][partner] = [];
-      //     }
-      //     let hasSupport = partnerSummaryData[prgArea][partner].some(
-      //       (obj) => obj.type_of_support === progData.type_of_support
-      //     );
-      //     if (!hasSupport) {
-      //       partnerSummaryData[prgArea][partner].push(progData);
-      //     }
-      //   });
-      // });
-
-      // {
-      //     "Are_you_collaborating_with_any_other_partners": "Yes",
-      //     "Campaign_Focus": [
-      //         "Measles Rubella"
-      //     ],
-      //     "Campaign_Focus_Other": "",
-      //     "Designation_of_respondent": "Communications Lead",
-      //     "Email_Address_of_Respondent": "ndidi.c@c-wins.org",
-      //     "End_date_of_support": "2025-12-31 00:00:00.000Z",
-      //     "Key_Performance_Indicators": "",
-      //     "LGA_supported": [
-      //         {
-      //             "lga": "Ibiono Ibom",
-      //             "state": "Akwa Ibom"
-      //         }
-      //     ],
-      //     "Level_of_support": [
-      //         "National",
-      //         "State"
-      //     ],
-      //     "List_the_Partners": [
-      //         "IVAC",
-      //         "UNICEF",
-      //         "AFENET"
-      //     ],
-      //     "Name_of_Organization_Agency": "Centre for Well-being and Integrated Nutrition Solutions",
-      //     "Name_of_Respondent": "Ndidichukwu Odoh",
-      //     "Phone_Number_of_Respondent": "08057033414",
-      //     "Start_date_of_support": "2024-11-05 00:00:00.000Z",
-      //     "States_supported": [
-      //         {
-      //             "state": "Cross River"
-      //         },
-      //     ],
-      //     "Status_of_support": "In Progress",
-      //     "Summary_of_Support": "The Centre for Well-being and Integrated Nutrition Solutions roader health goals and aligns with the global Immunization Agenda 2030 by addressing zero-dose burdens and improving health system resilience.",
-      //     "Thematic_areas_supported": [
-      //         {
-      //             "area": "ACSM",
-      //             "kpi": "MR vaccine introduced in Q4 2025 with 95% campaign coverage.   National MCV1 and MCV2 routine coverage rates improve quarterly from introduction.",
-      //             "sub_areas": [
-      //                 "Program Advocacy"
-      //             ],
-      //             "support_level": [
-      //                 "National",
-      //                 "States",
-      //                 "LGAs"
-      //             ]
-      //         },
-      //         {
-      //             "area": "MERLA (Monitoring, Evaluation, Research, Learning and Accountability)",
-      //             "kpi": "Permedia influencer posts.  Proportion of states with acceptable admin-survey coverage gap post-campaign.",
-      //             "sub_areas": [
-      //                 "Knowledge management and learning"
-      //             ],
-      //             "support_level": [
-      //                 "National",
-      //                 "States",
-      //                 "LGAs"
-      //             ]
-      //         }
-      //     ],
-      //     "Type_of_Organization_Agency": [
-      //         "Implementing Partner"
-      //     ],
-      //     "Type_of_Support": [
-      //         {
-      //             "deployment_states": [
-      //                 {
-      //                     "state": "Cross River"
-      //                 },
-
-      //             ],
-      //             "number_of_personnel": 6,
-      //             "personnel_deployed": true,
-      //             "support_type": "Technical Support"
-      //         }
-      //     ],
-      //     "Who_is_the_Funder_of_your_project": "Gates Foundation"
-      // }
-
-      // else if (this.view == "chart") {
-      //   // this.selectedPrograms = null;
-      //   this.chartDataKeys = Object.keys(this.mapData[this.view]["data"]);
-      //   this.chartDataKeys = this.chartDataKeys.sort();
-      //   // console.log(this.chartDataKeys);
-      //   this.chartCleanedData = [];
-      //   this.initChart();
-      // } else if (this.view == "ptins") {
-      //   const that = this;
-      //   let partnerSummaryData = {};
-      //   const insData = this.mapData[this.view]["data"];
-
-      //   Object.keys(insData).forEach((st) => {
-      //     Object.keys(insData[st]).forEach((lg) => {
-      //       insData[st][lg].forEach((progData) => {
-      //         let prgArea = progData.program_area;
-      //         let partner = progData.partner;
-
-      //         if (!partnerSummaryData[prgArea]) {
-      //           partnerSummaryData[prgArea] = {};
-      //         }
-
-      //         if (!partnerSummaryData[prgArea][partner]) {
-      //           partnerSummaryData[prgArea][partner] = [];
-      //         }
-
-      //         let hasSupport = partnerSummaryData[prgArea][partner].some(
-      //           (obj) => obj.type_of_support === progData.type_of_support
-      //         );
-
-      //         if (!hasSupport) {
-      //           partnerSummaryData[prgArea][partner].push(progData);
-      //         }
-      //       });
-      //     });
-      //   });
-
-      //   that.partnerSummaryData = partnerSummaryData;
-      // }
-
       this.isLaoding = false;
     },
 
