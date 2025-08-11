@@ -44,17 +44,23 @@
           <div class="flex items-center">
             <div class="w-4 h-4 bg-teal-400 rounded mr-3"></div>
             <span class="text-sm text-gray-600">Technical Support</span>
-            <span class="ml-auto text-sm font-medium">40%</span>
+            <span class="ml-auto text-sm font-medium"
+              >{{ supportTypesPieData.datasets[0].data[1] }}%</span
+            >
           </div>
           <div class="flex items-center">
             <div class="w-4 h-4 bg-teal-600 rounded mr-3"></div>
             <span class="text-sm text-gray-600">Funding</span>
-            <span class="ml-auto text-sm font-medium">30%</span>
+            <span class="ml-auto text-sm font-medium"
+              >{{ supportTypesPieData.datasets[0].data[2] }}%</span
+            >
           </div>
           <div class="flex items-center">
             <div class="w-4 h-4 bg-teal-900 rounded mr-3"></div>
             <span class="text-sm text-gray-600">Provision of Commodities</span>
-            <span class="ml-auto text-sm font-medium">60%</span>
+            <span class="ml-auto text-sm font-medium"
+              >{{ supportTypesPieData.datasets[0].data[0] }}%</span
+            >
           </div>
         </div>
       </div>
