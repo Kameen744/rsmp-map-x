@@ -3,7 +3,7 @@
     <div class="container flex justify-between mx-auto max-w-[90%]">
       <div class="flex">
         <div class="p-0 cursor-pointer">
-          <!-- <img :src="logo" alt="Logo" class="max-h-[5rem]"> -->
+          <img :src="logo" alt="Logo" class="max-w-[18rem]" />
         </div>
         <div class="p-0 cursor-pointer">
           <!-- <img :src="niger" alt="Logo" class="max-h-[5rem]"> -->
@@ -80,8 +80,9 @@ import { useMainStore } from "./../storage/store";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
-import logo from "./../assets/logo.svg";
+// import logo from "./../assets/logo.svg";
 // import niger from './../assets/niger.png';
+import logo from "./../assets/ResourceTrackerlogo.png";
 
 const store = useMainStore();
 const router = useRouter();

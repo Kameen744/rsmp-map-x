@@ -2,7 +2,7 @@
   <div
     class="bg-login sm:grid md:flex items-center justify-center h-screen bg-blue-700 p-4"
   >
-    <div class="space-y-6 p-8 min-w-[350px] bg-blue-700">
+    <div class="space-y-6 p-8 min-w-[350px] bg-blue-800">
       <h2 class="text-3xl text-white">Login</h2>
       <div>
         <label for="email" class="block mb-2 text-sm font-medium text-white"
@@ -30,7 +30,7 @@
       </div>
       <button
         type="submit"
-        class="relative btn btn-primary bg-blue-950 w-full"
+        class="relative btn btn-primary bg-blue-700 w-full"
         :class="loginProcess ? 'disabled' : ''"
         @click.prevent="login"
       >
@@ -45,10 +45,11 @@
       </div>
     </div>
     <div
-      class="bg-white p-8 py-4 rounded-lg shadow-xl min-h-[400px] max-w-[800px]"
+      class="bg-rsmp-sec text-white p-8 py-4 rounded-lg shadow-xl min-h-[400px] max-w-[800px]"
     >
       <div>
-        <!-- <img :src="logo" alt="logo" class="max-h-[100px]"> -->
+        <img :src="logo" alt="logo" class="max-h-[100px]" />
+        <div class="divider"></div>
       </div>
 
       <div class="flext justify-between items-center mt-4">
@@ -101,7 +102,8 @@
 import { useMainStore } from "./storage/store";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import logo from "./assets/logo2.svg";
+// import logo from "./assets/logo2.svg";
+import logo from "./assets/ResourceTrackerlogo.png";
 import sydani from "./assets/sydani.png";
 import chai from "./assets/chai.png";
 import unicef from "./assets/unicef.png";
