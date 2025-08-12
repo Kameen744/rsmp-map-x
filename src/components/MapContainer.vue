@@ -49,8 +49,8 @@
         </button>
       </div>
 
+      <!-- v-if="showSupportTypes" -->
       <div
-        v-if="showSupportTypes"
         class="bg-white font-bold text-[15px] shadow max-w-[75vw] overflow-auto mt-2"
       >
         <!-- <h3 class="p-2">TYPE OF SUPPORT</h3> -->
