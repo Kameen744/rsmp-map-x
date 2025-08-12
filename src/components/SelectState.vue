@@ -101,7 +101,7 @@ const sortedStates = computed(() => {
 });
 
 const SelectState = async (state) => {
-  // let sspt = selectedState.value[view.value];
+  let sspt = selectedState.value[view.value];
   // let ssptLength = sspt.length;
   // if (ssptLength == states.value.length) {
   //   selectedState.value[view.value] = [];
@@ -119,9 +119,25 @@ const SelectState = async (state) => {
   // if (selectedState.value[view.value].length == 1) {
   //   store.launchAappLga();
   // }
+  if (sspt.includes(state.state)) {
+    selectedState.value[view.value] = sspt.filter(
+      (item) => item !== state.state
+    );
 
-  selectedState.value[view.value] = [];
-  selectedState.value[view.value].push(state.state);
+    if (selectedState.value[view.value].length === 0) {
+      if (view.value != "map") {
+        store.updateApp();
+      } else {
+        view.value = "map";
+        store.launchAapp();
+      }
+      return;
+    }
+  } else {
+    selectedState.value[view.value] = [];
+    selectedState.value[view.value].push(state.state);
+  }
+
   if (view.value != "map") {
     store.updateApp();
   } else {
