@@ -86,7 +86,6 @@ export const useMainStore = defineStore("useMainStore", {
     ],
 
     chartDataLoaded: null,
-
     campaignBarChartRef: null,
     campaignBarChartData: {
       labels: [],
@@ -1838,6 +1837,7 @@ export const useMainStore = defineStore("useMainStore", {
               icon: icon,
               autoPan: true,
               autoPanOnFocus: true,
+              zIndexOffset: 100,
             })
               .addTo(this.natonalMapMarkers)
               .on("click", this.markerEventNational);

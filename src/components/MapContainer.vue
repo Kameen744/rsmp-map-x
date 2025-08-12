@@ -5,6 +5,7 @@
       class="min-h-[80vh] max-h-[80vh] overflow-hidden"
     >
     </div>
+    <div class="w-20 h-5 bg-white absolute bottom-0 right-0 z-[9999]"> </div>
     <div class="absolute top-[10px] left-[80px] z-[991] bg-transparent">
       <div class="flex">
         <button
