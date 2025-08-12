@@ -116,7 +116,7 @@ export const useMainStore = defineStore("useMainStore", {
       datasets: [
         {
           data: [],
-          backgroundColor: ["#dc2626", "#64748b", "#16a34a"],
+          backgroundColor: ["#FE7072", "#F6C80B", "#54EC18"],
           borderWidth: 0,
           cutout: "60%",
         },
@@ -1464,34 +1464,34 @@ export const useMainStore = defineStore("useMainStore", {
 
         if (statusCompleted > 0) {
           statusCompleted = ((statusCompleted / insData.length) * 100).toFixed(
-            2
+            0
           );
         }
 
         if (statusOngoing > 0) {
-          statusOngoing = ((statusOngoing / insData.length) * 100).toFixed(2);
+          statusOngoing = ((statusOngoing / insData.length) * 100).toFixed(0);
         }
 
         if (statusPending > 0) {
-          statusPending = ((statusPending / insData.length) * 100).toFixed(2);
+          statusPending = ((statusPending / insData.length) * 100).toFixed(0);
         }
 
         if (ProvisionofCommodities > 0) {
           ProvisionofCommodities = (
             (ProvisionofCommodities / insData.length) *
             100
-          ).toFixed(2);
+          ).toFixed(0);
         }
 
         if (statusPending > 0) {
           TechnicalSupport = (
             (TechnicalSupport / insData.length) *
             100
-          ).toFixed(2);
+          ).toFixed(0);
         }
 
         if (Funding > 0) {
-          Funding = ((Funding / insData.length) * 100).toFixed(2);
+          Funding = ((Funding / insData.length) * 100).toFixed(0);
         }
 
         // console.log([statusPending, statusOngoing, statusCompleted]);

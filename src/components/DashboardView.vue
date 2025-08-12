@@ -44,23 +44,23 @@
           <div class="flex items-center">
             <div class="w-4 h-4 bg-teal-400 rounded mr-3"></div>
             <span class="text-sm text-gray-600">Technical Support</span>
-            <span class="ml-auto text-sm font-medium"
-              >{{ supportTypesPieData.datasets[0].data[1] }}%</span
-            >
+            <span class="ml-auto text-sm font-medium">{{
+              supportTypesPieData.datasets[0].data[1]
+            }}</span>
           </div>
           <div class="flex items-center">
             <div class="w-4 h-4 bg-teal-600 rounded mr-3"></div>
             <span class="text-sm text-gray-600">Funding</span>
-            <span class="ml-auto text-sm font-medium"
-              >{{ supportTypesPieData.datasets[0].data[2] }}%</span
-            >
+            <span class="ml-auto text-sm font-medium">{{
+              supportTypesPieData.datasets[0].data[2]
+            }}</span>
           </div>
           <div class="flex items-center">
             <div class="w-4 h-4 bg-teal-900 rounded mr-3"></div>
             <span class="text-sm text-gray-600">Provision of Commodities</span>
-            <span class="ml-auto text-sm font-medium"
-              >{{ supportTypesPieData.datasets[0].data[0] }}%</span
-            >
+            <span class="ml-auto text-sm font-medium">{{
+              supportTypesPieData.datasets[0].data[0]
+            }}</span>
           </div>
         </div>
       </div>
@@ -99,30 +99,39 @@
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <div class="w-4 h-4 bg-red-600 rounded mr-3"></div>
+              <div
+                class="w-4 h-4 rounded mr-3"
+                :class="getStatusColor('Pending')"
+              ></div>
               <span class="text-sm text-gray-600">Pending</span>
             </div>
-            <span class="text-sm font-medium"
-              >{{ statusDoughnutData.datasets[0].data[0] }}%</span
-            >
+            <span class="text-sm font-medium">{{
+              statusDoughnutData.datasets[0].data[0]
+            }}</span>
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <div class="w-4 h-4 bg-gray-500 rounded mr-3"></div>
+              <div
+                class="w-4 h-4 rounded mr-3"
+                :class="getStatusColor('In Progress')"
+              ></div>
               <span class="text-sm text-gray-600">Ongoing</span>
             </div>
-            <span class="text-sm font-medium"
-              >{{ statusDoughnutData.datasets[0].data[1] }}%</span
-            >
+            <span class="text-sm font-medium">{{
+              statusDoughnutData.datasets[0].data[1]
+            }}</span>
           </div>
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <div class="w-4 h-4 bg-green-600 rounded mr-3"></div>
+              <div
+                class="w-4 h-4 rounded mr-3"
+                :class="getStatusColor('Completed')"
+              ></div>
               <span class="text-sm text-gray-600">Completed</span>
             </div>
-            <span class="text-sm font-medium"
-              >{{ statusDoughnutData.datasets[0].data[2] }}%</span
-            >
+            <span class="text-sm font-medium">{{
+              statusDoughnutData.datasets[0].data[2]
+            }}</span>
           </div>
         </div>
       </div>
@@ -166,6 +175,19 @@ const {
 //   { label: "Campaign Focus", value: "7", color: "text-teal-500" },
 //   { label: "Thematic Areas", value: "56", color: "text-teal-500" },
 // ]);
+
+const getStatusColor = (status) => {
+  let cls = "";
+  if (status == "In Progress") {
+    cls = "bg-yellow-400";
+  } else if (status == "Completed") {
+    cls = "bg-green-400";
+  } else if (status == "Pending") {
+    cls = "bg-red-400";
+  }
+  console.log(status, cls);
+  return cls;
+};
 
 const initializeCharts = () => {
   // Support Types Pie Chart
