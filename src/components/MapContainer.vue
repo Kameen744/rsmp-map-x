@@ -106,13 +106,14 @@ import NationalDataShow from "./NationalDataShow.vue";
 
 const store = useMainStore();
 const showSupportTypes = ref(false);
-const showNationalData = ref(false);
+// const showNationalData = ref(false);
 const {
   mapContainerRef,
   selectedLgaMarker,
   currentSupports,
   mapData,
   selectedMarker,
+  showNationalData,
   // mapContainerRefMain,
   view,
   mapType,

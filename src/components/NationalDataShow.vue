@@ -10,6 +10,27 @@
           v-model="searchTerm"
         />
       </div>
+      <button
+        class="btn btn-square btn-xs mt-1"
+        @click="showNationalData = !showNationalData"
+        ><svg
+          class="w-6 h-6 text-gray-800"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18 17.94 6M18 18 6.06 6"
+          />
+        </svg>
+      </button>
     </div>
 
     <div class="min-w-full p-4 max-h-[60vh] overflow-y-auto">
@@ -66,7 +87,8 @@ import { ref, computed } from "vue";
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from "pinia";
 const store = useMainStore();
-const { nationalMapDataToShow, selectedMarker } = storeToRefs(store);
+const { nationalMapDataToShow, showNationalData, selectedMarker } =
+  storeToRefs(store);
 
 const searchTerm = ref("");
 const filteredNationalData = computed(() => {

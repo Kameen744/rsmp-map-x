@@ -76,6 +76,7 @@ export const useMainStore = defineStore("useMainStore", {
     selectedStartDate: "2020-01-01",
     selectedEndDate: "2030-12-31",
     nationalMapDataToShow: [],
+    showNationalData: false,
     dashboardStats: [
       { label: "States Supported", value: 0, color: "text-teal-500" },
       { label: "LGAs Supported", value: 0, color: "text-teal-500" },
