@@ -80,7 +80,7 @@
       <!-- show National data -->
       <div
         v-if="showNationalData"
-        class="bg-white font-bold rounded-md text-[15px] shadow max-w-[75vw] overflow-auto mt-2"
+        class="bg-white font-bold rounded-md text-[15px] shadow max-w-[75vw] overflow-auto mt-1"
       >
         <NationalDataShow></NationalDataShow>
       </div>

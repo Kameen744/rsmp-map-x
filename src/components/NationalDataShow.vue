@@ -10,9 +10,7 @@
           v-model="searchTerm"
         />
       </div>
-      <button
-        class="btn btn-square btn-xs mt-1"
-        @click="showNationalData = !showNationalData"
+      <button class="btn btn-square btn-xs mt-1" @click="closeNationalData"
         ><svg
           class="w-6 h-6 text-gray-800"
           aria-hidden="true"
@@ -33,7 +31,7 @@
       </button>
     </div>
 
-    <div class="min-w-full p-4 max-h-[60vh] overflow-y-auto">
+    <div class="min-w-[50vw] p-4 max-h-[67vh] overflow-y-auto">
       <div v-for="data in filteredNationalData">
         <div
           class="bg-slate-100 rounded-md p-3 mt-3 cursor-pointer"
@@ -87,10 +85,24 @@ import { ref, computed } from "vue";
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from "pinia";
 const store = useMainStore();
-const { nationalMapDataToShow, showNationalData, selectedMarker } =
-  storeToRefs(store);
+const {
+  nationalMapDataToShow,
+  showNationalData,
+  selectedData,
+  selectedMarker,
+  mapType,
+} = storeToRefs(store);
 
 const searchTerm = ref("");
+const closeNationalData = () => {
+  showNationalData.value = !showNationalData.value;
+  if (mapType.value == "states") {
+    selectedData.value = "State Data";
+  } else if (mapType.value == "lgas") {
+    selectedData.value = "LGA Data";
+  }
+};
+
 const filteredNationalData = computed(() => {
   if (!searchTerm.value) {
     return nationalMapDataToShow.value;

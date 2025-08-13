@@ -87,7 +87,7 @@ const toggleDroped = () => {
   dropped.value = !dropped.value;
 };
 
-const adminDataOptions = ["National Data", "State Data", "Lga Data"];
+const adminDataOptions = ["National Data", "State Data", "LGA Data"];
 
 const SelectLevel = (level) => {
   // state
@@ -101,7 +101,7 @@ const SelectLevel = (level) => {
     mapType.value = "states";
     store.launchAapp();
     // store.updateApp();
-  } else if (level == "Lga Data") {
+  } else if (level == "LGA Data") {
     showNationalData.value = false;
   }
 

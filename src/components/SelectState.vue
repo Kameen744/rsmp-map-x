@@ -1,7 +1,7 @@
 <template>
   <template
     class="min-[3rem]: flex justify-start"
-    v-show="selectedData == 'Lga Data'"
+    v-show="selectedData == 'LGA Data'"
   >
     <div
       class="dropdown dropdown-bottom"

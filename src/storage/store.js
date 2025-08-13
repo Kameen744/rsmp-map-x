@@ -1689,7 +1689,7 @@ export const useMainStore = defineStore("useMainStore", {
     },
 
     async zoomToMapFeatureNational(e) {
-      this.selectedData = "Lga Data";
+      this.selectedData = "LGA Data";
       let dataSet = e.target.feature.properties;
       // let mpd = this.mapNationalData[this.view];
 
