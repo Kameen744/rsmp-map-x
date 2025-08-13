@@ -1,71 +1,78 @@
 <template>
-  <template class="min-[3rem]: flex justify-start">
-    <div class="dropdown dropdown-bottom">
-      <SelectBadge
-        title="States"
-        v-if="selectedState[view].length > 0"
-      ></SelectBadge>
-
+  <template
+    class="min-[3rem]: flex justify-start"
+    v-show="selectedData == 'Lga Data'"
+  >
+    <div
+      class="dropdown dropdown-bottom"
+      @click="toggleDroped"
+      @mouseleave="dropped = false"
+    >
+      <SelectBadge title="State" v-if="selectedState[view]"></SelectBadge>
       <div
         tabindex="0"
         role="button"
-        class="inline-flex justify-between shadow-sm p-3 py-1 m-1 pl-3 text-lg rounded-md border-2 border-rsmp-sec min-w-36"
+        class="inline-flex justify-between shadow-sm p-3 py-1 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec min-w-36"
       >
         <div class="inline-flex max-w-28 overflow-hidden">
-          <div>
-            <div class="text-nowrap" v-if="selectedState[view].length <= 0">
-              State
-            </div>
-            <!-- v-for="state in states" -->
-            <div v-else class="text-nowrap">
-              <!-- {{ state.state }} -->
-              {{ selectedState[view].length }} Selected
-            </div>
-          </div>
+          {{ selectedState[view][0] ? selectedState[view][0] : "State" }}
         </div>
         <b
           class="ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900"
         >
-          <CheckPlusIcon></CheckPlusIcon>
+          <svg
+            v-if="dropped"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="mt-1 ml-1 w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m4.5 15.75 7.5-7.5 7.5 7.5"
+            />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="mt-1 ml-1 w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m19.5 8.25-7.5 7.5-7.5-7.5"
+            />
+          </svg>
         </b>
       </div>
-
       <ul
         tabindex="0"
-        class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-md max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec"
+        class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec"
+        v-if="dropped"
       >
-        <li class="rounded-md border-b-2 border-blue-50">
-          <a
-            href=""
-            @click.prevent="selectAllStates()"
-            class="hover:rounded-md text-lg inline-flex justify-between"
-          >
-            <span>Select All</span>
+        <!-- <li class="rounded-none border-b-2 border-blue-50">
+          <a href="" @click.prevent="SelectState(null)" class="hover:rounded-none text-lg">
+            State
           </a>
-        </li>
+        </li> -->
         <li
-          class="rounded-md border-b-2 border-blue-50"
-          v-for="state in sortedStates"
-          :class="
-            store.selected(selectedState[view], state.state)
-              ? 'bg-blue-300'
-              : ''
-          "
+          class="rounded-none border-b-2 border-blue-50"
+          v-for="state in states"
         >
           <a
             href=""
             @click.prevent="SelectState(state)"
-            class="hover:rounded-md text-lg inline-flex justify-between"
+            class="hover:rounded-none text-lg"
+            :class="selectedState[view][0] == state.state ? 'bg-slate-300' : ''"
           >
-            <span>{{ state.state }}</span>
-            <b
-              class="w-8 h-8 rounded-full pr-1 text-center text-xs text-blue-900"
-            >
-              <CheckIcon
-                v-if="selectedState[view].includes(state.state)"
-              ></CheckIcon>
-              <CloseIcon v-else></CloseIcon>
-            </b>
+            {{ state.state }}
           </a>
         </li>
       </ul>
@@ -84,7 +91,7 @@ import CloseIcon from "./CloseIcon.vue";
 
 const store = useMainStore();
 
-const { selectedState, selectedLga, view, states, mapType } =
+const { selectedState, selectedLga, selectedData, view, states, mapType } =
   storeToRefs(store);
 
 const dropped = ref(false);

@@ -6,22 +6,24 @@
     >
     </div>
     <div class="w-20 h-5 bg-white absolute bottom-0 right-0 z-[9999]"> </div>
-    <div class="absolute top-[10px] left-[80px] z-[991] bg-transparent">
+    <div
+      class="absolute top-[5px] align-middle self-center left-[10%] z-[991] bg-transparent"
+    >
       <div class="flex">
-        <button
+        <!-- <button
           v-if="currentSupports[view]"
           class="font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]"
           @click="showSupportTypes = !showSupportTypes"
         >
           <h6 class="p-0 m-0">KEY</h6>
-        </button>
-        <button
+        </button> -->
+        <!-- <button
           v-if="currentSupports[view]"
           class="font-bold text-[15px] ml-2 p-2 shadow bg-white rounded cursor-pointer max-w-[150px]"
           @click="showNationalData = !showNationalData"
         >
           <h6 class="p-0 m-0">National Data</h6>
-        </button>
+        </button> -->
         <button
           v-if="mapType == 'lgas'"
           class="font-bold text-[15px] ml-2 p-2 shadow bg-white rounded cursor-pointer max-w-[70px]"
@@ -51,20 +53,9 @@
       </div>
 
       <!-- v-if="showSupportTypes" -->
-      <div
+      <!-- <div
         class="bg-white font-bold text-[15px] shadow max-w-[75vw] overflow-auto mt-2"
       >
-        <!-- <h3 class="p-2">TYPE OF SUPPORT</h3> -->
-        <!-- <div class="flex justify-start pr-4 mr-4">
-          <div
-            class="p-3 py-2 text-cyan-50 m-2"
-            v-for="(val, key) in currentSupports[view]"
-            :style="`background: ${val.bg};`"
-          >
-            {{ key }}
-          </div>
-        </div>
-        <hr /> -->
         <h3 class="p-2">STATUS</h3>
         <div class="flex justify-start p-2">
           <div class="mr-3">
@@ -85,13 +76,66 @@
             <b>Pending</b>
           </div>
         </div>
-      </div>
+      </div> -->
       <!-- show National data -->
       <div
         v-if="showNationalData"
-        class="bg-white font-bold text-[15px] shadow max-w-[75vw] overflow-auto mt-2"
+        class="bg-white font-bold rounded-md text-[15px] shadow max-w-[75vw] overflow-auto mt-2"
       >
         <NationalDataShow></NationalDataShow>
+      </div>
+    </div>
+
+    <!-- status -->
+    <div class="absolute top-[11vh] left-[10px] z-[991] bg-transparent">
+      <!-- <div class="flex">
+        <button
+          v-if="currentSupports[view]"
+          class="font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]"
+          @click="showSupportTypes = !showSupportTypes"
+        >
+          <h6 class="p-0 m-0">KEY</h6>
+        </button>
+      </div> -->
+
+      <!-- v-if="showSupportTypes" -->
+      <div
+        class="bg-white font-bold text-[15px] rounded-md shadow max-w-[75vw] overflow-auto mt-2"
+      >
+        <!-- <h3 class="p-2">TYPE OF SUPPORT</h3> -->
+        <!-- <div class="flex justify-start pr-4 mr-4">
+          <div
+            class="p-3 py-2 text-cyan-50 m-2"
+            v-for="(val, key) in currentSupports[view]"
+            :style="`background: ${val.bg};`"
+          >
+            {{ key }}
+          </div>
+        </div>
+        <hr /> -->
+        <h3 class="text-center mt-2 mb-1">STATUS</h3>
+        <hr />
+        <div class="p-2">
+          <div class="">
+            <div
+              class="mx-auto shadow-sm w-8 h-8 rounded-full bg-yellow-400"
+            ></div>
+            <h4 class="text-center text-sm font-mono">Ongoing</h4>
+          </div>
+          <div class="divider"></div>
+          <div class="">
+            <div class="mx-auto shadow-sm w-8 h-8 bg-green-400"></div>
+            <h4 class="text-center text-sm font-mono">Completed</h4>
+          </div>
+          <div class="divider"></div>
+          <div class="">
+            <div
+              class="mx-auto w-0 h-0 border-l-[20px] border-l-transparent border-b-[32px] border-red-400 border-r-[20px] border-r-transparent"
+            >
+            </div>
+            <h4 class="text-center text-sm font-mono">Pending</h4>
+          </div>
+        </div>
       </div>
     </div>
     <MarkerPopup v-if="selectedLgaMarker || selectedMarker"></MarkerPopup>
