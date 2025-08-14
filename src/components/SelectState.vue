@@ -1,7 +1,7 @@
 <template>
   <template
     class="min-[3rem]: flex justify-start"
-    v-show="selectedData == 'LGA Data'"
+    v-show="selectedData == 'LGA'"
   >
     <div
       class="dropdown dropdown-bottom"
@@ -64,7 +64,7 @@
         </li> -->
         <li
           class="rounded-none border-b-2 border-blue-50"
-          v-for="state in states"
+          v-for="state in sortedStates"
         >
           <a
             href=""

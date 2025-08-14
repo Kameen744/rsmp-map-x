@@ -97,9 +97,9 @@ const searchTerm = ref("");
 const closeNationalData = () => {
   showNationalData.value = !showNationalData.value;
   if (mapType.value == "states") {
-    selectedData.value = "State Data";
+    selectedData.value = "State";
   } else if (mapType.value == "lgas") {
-    selectedData.value = "LGA Data";
+    selectedData.value = "LGA";
   }
 };
 

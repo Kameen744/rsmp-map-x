@@ -12,7 +12,7 @@
         class="inline-flex justify-between shadow-sm p-3 py-1 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec min-w-36"
       >
         <div class="inline-flex max-w-28 overflow-hidden">
-          {{ showNationalData ? "National Data" : "State Data" }}
+          {{ showNationalData ? "National Data" : "Admin Level" }}
         </div>
         <b
           class="ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900"
@@ -87,21 +87,21 @@ const toggleDroped = () => {
   dropped.value = !dropped.value;
 };
 
-const adminDataOptions = ["National Data", "State Data", "LGA Data"];
+const adminDataOptions = ["National", "State", "LGA"];
 
 const SelectLevel = (level) => {
   // state
   //   ? (selectedState[view.value].value = state.state)
   //   : (selectedState.value[view.value] = state);
   selectedData.value = level;
-  if (level == "National Data") {
+  if (level == "National") {
     showNationalData.value = true;
-  } else if (level == "State Data") {
+  } else if (level == "State") {
     showNationalData.value = false;
     mapType.value = "states";
     store.launchAapp();
     // store.updateApp();
-  } else if (level == "LGA Data") {
+  } else if (level == "LGA") {
     showNationalData.value = false;
   }
 

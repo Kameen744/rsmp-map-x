@@ -15,7 +15,7 @@ export const useMainStore = defineStore("useMainStore", {
     isLaoding: false,
     view: "map",
     lgaNameIcon: null,
-    selectedData: "State Data",
+    selectedData: "Admin Level",
     mapType: "states",
     map: null,
     lgaMap: null,
@@ -1689,7 +1689,7 @@ export const useMainStore = defineStore("useMainStore", {
     },
 
     async zoomToMapFeatureNational(e) {
-      this.selectedData = "LGA Data";
+      this.selectedData = "LGA";
       let dataSet = e.target.feature.properties;
       // let mpd = this.mapNationalData[this.view];
 
@@ -1912,7 +1912,7 @@ export const useMainStore = defineStore("useMainStore", {
       // this.states.forEach((s) => {
       //   this.selectedState[this.view].push(s.state);
       // });
-      this.selectedData = "State Data";
+      this.selectedData = "State";
       this.mapType = "states";
       this.updateApp();
     },

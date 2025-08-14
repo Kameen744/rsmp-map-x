@@ -47,7 +47,7 @@ async function fetchLgaGeoJSON(stateName) {
   // Note: Ensure your GeoJSON filenames match the state names exactly.
   const response = await fetch(`/data/lgas/${stateName}.geojson`);
   if (!response.ok) {
-    console.error(`LGA data for ${stateName} not found.`);
+    // console.error(`LGA data for ${stateName} not found.`);
     return null; // Return null to handle missing files gracefully
   }
   return await response.json();
