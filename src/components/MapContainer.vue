@@ -113,27 +113,27 @@
           </div>
         </div>
         <hr /> -->
-        <h3 class="text-center mt-2 mb-1">STATUS</h3>
+        <h3 class="text-center mt-2 mb-1 text-[9px]">STATUS</h3>
         <hr />
-        <div class="p-2">
+        <div class="p-1">
           <div class="">
             <div
-              class="mx-auto shadow-sm w-8 h-8 rounded-full bg-yellow-400"
+              class="mx-auto shadow-sm w-6 h-6 rounded-full bg-yellow-400"
             ></div>
-            <h4 class="text-center text-sm font-mono">Ongoing</h4>
+            <h4 class="text-center text-[9px] font-mono">Ongoing</h4>
           </div>
-          <div class="divider"></div>
+          <div class="divider my-0"></div>
           <div class="">
-            <div class="mx-auto shadow-sm w-8 h-8 bg-green-400"></div>
-            <h4 class="text-center text-sm font-mono">Completed</h4>
+            <div class="mx-auto shadow-sm w-6 h-6 bg-green-400"></div>
+            <h4 class="text-center text-[9px] font-mono">Completed</h4>
           </div>
-          <div class="divider"></div>
+          <div class="divider my-0"></div>
           <div class="">
             <div
-              class="mx-auto w-0 h-0 border-l-[20px] border-l-transparent border-b-[32px] border-red-400 border-r-[20px] border-r-transparent"
+              class="mx-auto w-0 h-0 border-l-[15px] border-l-transparent border-b-[32px] border-red-400 border-r-[15px] border-r-transparent"
             >
             </div>
-            <h4 class="text-center text-sm font-mono">Pending</h4>
+            <h4 class="text-center text-[9px] font-mono">Pending</h4>
           </div>
         </div>
       </div>
