@@ -118,22 +118,22 @@
         <div class="p-1">
           <div class="">
             <div
-              class="mx-auto shadow-sm w-6 h-6 rounded-full bg-yellow-400"
+              class="mx-auto shadow-sm w-5 h-5 rounded-full bg-yellow-400"
             ></div>
-            <h4 class="text-center text-[9px] font-mono">Ongoing</h4>
+            <h4 class="text-center text-[8px] font-mono">Ongoing</h4>
           </div>
           <div class="divider my-0"></div>
           <div class="">
-            <div class="mx-auto shadow-sm w-6 h-6 bg-green-400"></div>
-            <h4 class="text-center text-[9px] font-mono">Completed</h4>
+            <div class="mx-auto shadow-sm w-5 h-5 bg-green-400"></div>
+            <h4 class="text-center text-[8px] font-mono">Completed</h4>
           </div>
           <div class="divider my-0"></div>
           <div class="">
             <div
-              class="mx-auto w-0 h-0 border-l-[15px] border-l-transparent border-b-[32px] border-red-400 border-r-[15px] border-r-transparent"
+              class="mx-auto w-0 h-0 border-l-[10px] border-l-transparent border-b-[20px] border-red-400 border-r-[10px] border-r-transparent"
             >
             </div>
-            <h4 class="text-center text-[9px] font-mono">Pending</h4>
+            <h4 class="text-center text-[8px] font-mono">Pending</h4>
           </div>
         </div>
       </div>
