@@ -1601,6 +1601,19 @@ export const useMainStore = defineStore("useMainStore", {
       };
     },
 
+    countOrganizationsByState(state) {
+      const seen = new Set();
+
+      this.mapNationalData[this.view].forEach((item) => {
+        // console.log(state, item.States_supported);
+        if (item.States_supported?.some((st) => st.state == state)) {
+          seen.add(item.Name_of_Organization_Agency);
+        }
+      });
+
+      return seen.size;
+    },
+
     highlightNationalMapFeature(e) {
       if (this.viewingMap) {
         return;
@@ -1608,11 +1621,15 @@ export const useMainStore = defineStore("useMainStore", {
       var layer = e.target;
       // layer.openPopup();
       // layer.bindTooltip()
-      var tlt = tooltip().setContent(`
-        <div class="bg-blue-600 text-white text-lg font-bold m-0 p-0 px-2">
-        ${e.target.feature.properties.state}
+      // tooltip().setContent();
+      var tlt = `
+        <div class="text-white text-lg font-bold m-0 p-0 px-2">
+          <p class="text-center">${e.target.feature.properties.state}</p>
+          <p class="text-center"><small>(${this.countOrganizationsByState(
+            e.target.feature.properties.state
+          )} partners)</small> </p>
         </div>
-      `);
+      `;
       layer.bindTooltip(tlt);
       layer.openTooltip();
 

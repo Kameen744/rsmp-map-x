@@ -113,7 +113,7 @@
           </div>
         </div>
         <hr /> -->
-        <h3 class="text-center mt-2 mb-1 text-[9px]">STATUS</h3>
+        <h3 class="text-center mt-2 mb-1 text-[9px]">KEY</h3>
         <hr />
         <div class="p-1">
           <div class="">
@@ -214,5 +214,13 @@ div.leaflet-marker-icon {
 .facilities-marker div {
   width: 8px;
   height: 8px;
+}
+
+.leaflet-tooltip {
+  background-color: #333; /* Dark grey background */
+  color: #fff; /* White text color */
+}
+.leaflet-tooltip-tip {
+  border-top-color: #333; /* Matches the background color */
 }
 </style>

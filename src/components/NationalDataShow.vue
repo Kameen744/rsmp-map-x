@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="bg-orange-400 min-w-full p-4 flex justify-between">
-      <h2 class="pt-1">National Supports</h2>
+      <h2 class="pt-1">National Support</h2>
       <div class="ml-2">
         <input
           class="input-sm rounded-md border-none"
@@ -104,11 +104,20 @@ const closeNationalData = () => {
 };
 
 const filteredNationalData = computed(() => {
+  const seen = new Set();
+  const nationalMapData = nationalMapDataToShow.value.filter((item) => {
+    if (seen.has(item.Name_of_Organization_Agency)) {
+      return false;
+    }
+    seen.add(item.Name_of_Organization_Agency);
+    return true;
+  });
+
   if (!searchTerm.value) {
-    return nationalMapDataToShow.value;
+    return nationalMapData;
   }
 
-  return nationalMapDataToShow.value.filter((d) =>
+  return nationalMapData.filter((d) =>
     d.Name_of_Organization_Agency.toLowerCase().includes(
       searchTerm.value.toLowerCase()
     )
