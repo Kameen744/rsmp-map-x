@@ -6,6 +6,7 @@ import { capitalize, toRaw } from "vue";
 import * as localForage from "localforage";
 // import * as Chart from "chart.js";
 import PocketBase from "pocketbase";
+import { set } from "nprogress";
 const pbUrl = "https://pb-api.resourcetrackr.com";
 const pb = new PocketBase(pbUrl);
 Chart.defaults.datasets.bar.maxBarThickness = 25;
@@ -38,6 +39,7 @@ export const useMainStore = defineStore("useMainStore", {
     mapLgaData: {},
     chartData: null,
     partnerSummaryData: {},
+    // partnerSummaryTableData: {},
     chartMainContainerRef: null,
     chartMainContainerCSORef: null,
     statusContRef: null,
@@ -78,6 +80,7 @@ export const useMainStore = defineStore("useMainStore", {
     selectedEndDate: "2030-12-31",
     nationalMapDataToShow: [],
     showNationalData: false,
+
     dashboardStats: [
       { label: "States Supported", value: 0, color: "text-teal-500" },
       { label: "LGAs Supported", value: 0, color: "text-teal-500" },
@@ -1276,7 +1279,46 @@ export const useMainStore = defineStore("useMainStore", {
         const that = this;
         let partnerSummaryData = {};
 
-        let addToSumData = (cFocus, orgAgency, dObj) => {
+        // let addToSumData = (cFocus, orgAgency, dObj) => {
+        //   if (
+        //     orgAgency ==
+        //     "Centre for Well-being and Integrated Nutrition Solutions"
+        //   ) {
+        //     orgAgency =
+        //       "Centre for Well-being and Integrated Nutrition Solutions (C-WINS)";
+        //   }
+
+        //   if (cFocus && cFocus != "") {
+        //     if (!partnerSummaryData[cFocus]) {
+        //       partnerSummaryData[cFocus] = {};
+        //     }
+        //     if (!partnerSummaryData[cFocus][orgAgency]) {
+        //       partnerSummaryData[cFocus][orgAgency] = [];
+        //     }
+
+        //     let exst = partnerSummaryData[cFocus][orgAgency].some((obj) => {
+        //       if (
+        //         obj.End_date_of_support == dObj.End_date_of_support &&
+        //         obj.Start_date_of_support == dObj.Start_date_of_support &&
+        //         JSON.stringify(obj.Level_of_support) ===
+        //           JSON.stringify(dObj.Level_of_support) &&
+        //         obj.Who_is_the_Funder_of_your_project ==
+        //           obj.Who_is_the_Funder_of_your_project
+        //       ) {
+        //         return obj;
+        //       } else {
+        //         return false;
+        //       }
+        //     });
+
+        //     // console.log("exists: ", exst);
+        //     if (!exst) {
+        //       partnerSummaryData[cFocus][orgAgency].push(dObj);
+        //     }
+        //   }
+        // };
+
+        let addToSumData = (orgAgency, dObj) => {
           if (
             orgAgency ==
             "Centre for Well-being and Integrated Nutrition Solutions"
@@ -1285,15 +1327,15 @@ export const useMainStore = defineStore("useMainStore", {
               "Centre for Well-being and Integrated Nutrition Solutions (C-WINS)";
           }
 
-          if (cFocus && cFocus != "") {
-            if (!partnerSummaryData[cFocus]) {
-              partnerSummaryData[cFocus] = {};
+          if (orgAgency && orgAgency != "") {
+            if (!partnerSummaryData[orgAgency]) {
+              partnerSummaryData[orgAgency] = [];
             }
-            if (!partnerSummaryData[cFocus][orgAgency]) {
-              partnerSummaryData[cFocus][orgAgency] = [];
-            }
+            // if (!partnerSummaryData[cFocus][orgAgency]) {
+            //   partnerSummaryData[cFocus][orgAgency] = [];
+            // }
 
-            let exst = partnerSummaryData[cFocus][orgAgency].some((obj) => {
+            let exst = partnerSummaryData[orgAgency].some((obj) => {
               if (
                 obj.End_date_of_support == dObj.End_date_of_support &&
                 obj.Start_date_of_support == dObj.Start_date_of_support &&
@@ -1308,27 +1350,32 @@ export const useMainStore = defineStore("useMainStore", {
               }
             });
 
-            // console.log("exists: ", exst);
             if (!exst) {
-              partnerSummaryData[cFocus][orgAgency].push(dObj);
+              partnerSummaryData[orgAgency].push(dObj);
             }
           }
         };
 
         for (let i = 0; i < insData.length; i++) {
           let dObj = insData[i];
-          addToSumData(
-            dObj.Campaign_Focus_Other,
-            dObj.Name_of_Organization_Agency,
-            dObj
-          );
+          // addToSumData(
+          //   dObj.Campaign_Focus_Other,
+          //   dObj.Name_of_Organization_Agency,
+          //   dObj
+          // );
 
-          dObj.Campaign_Focus.forEach((campaign) => {
-            addToSumData(campaign, dObj.Name_of_Organization_Agency, dObj);
-          });
+          addToSumData(dObj.Name_of_Organization_Agency, dObj);
+
+          // dObj.Campaign_Focus.forEach((campaign) => {
+          //   addToSumData(campaign, dObj.Name_of_Organization_Agency, dObj);
+          // });
         }
 
-        that.partnerSummaryData = partnerSummaryData;
+        that.partnerSummaryData = Object.fromEntries(
+          Object.entries(partnerSummaryData).sort(([a], [b]) =>
+            a.localeCompare(b, undefined, { sensitivity: "base" })
+          )
+        );
       } else if (this.view == "dashboard") {
         let insData = [];
         if (this.mapType == "states") {
@@ -1359,7 +1406,7 @@ export const useMainStore = defineStore("useMainStore", {
 
         this.campaignBarChartData.datasets[0].data = [];
         this.thematicLineChartData.datasets[0].data = [];
-
+        let partnersSet = new Set();
         for (let i = 0; i < insData.length; i++) {
           let dObj = insData[i];
 
@@ -1403,11 +1450,15 @@ export const useMainStore = defineStore("useMainStore", {
               lg_spt.push(lg.lga);
             }
           });
-          dObj.List_the_Partners.forEach((pat) => {
-            if (!partns.includes(pat)) {
-              partns.push(pat);
-            }
-          });
+          if (!partnersSet.has(dObj.Name_of_Organization_Agency)) {
+            partnersSet.add(dObj.Name_of_Organization_Agency);
+          }
+
+          // dObj.List_the_Partners.forEach((pat) => {
+          //   if (!partns.includes(pat)) {
+          //     partns.push(pat);
+          //   }
+          // });
 
           // This is for other focus areas
 
@@ -1456,7 +1507,7 @@ export const useMainStore = defineStore("useMainStore", {
 
         this.dashboardStats[0].value = st_spt.length;
         this.dashboardStats[1].value = lg_spt.length;
-        this.dashboardStats[2].value = partns.length;
+        this.dashboardStats[2].value = partnersSet.size;
         this.dashboardStats[3].value = cmpfcs.length;
         this.dashboardStats[4].value = thematic.length;
 

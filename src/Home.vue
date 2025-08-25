@@ -1,9 +1,9 @@
 <template>
   <template v-if="ready">
     <TopNavBar></TopNavBar>
-    <FiltersContainer></FiltersContainer>
+    <FiltersContainer v-if="view != 'ptins'"></FiltersContainer>
     <div
-      class="bg-slate-100 max-h-[80vh] overflow-hidden overflow-y-auto c-scroll"
+      class="bg-slate-100 max-h-[82vh] overflow-hidden overflow-y-auto c-scroll"
       :class="view == 'map' ? '' : 'pt-2'"
       v-on:scroll="store.scrollDataContainer"
     >
@@ -12,7 +12,10 @@
         v-if="view == 'chart'"
       ></StatusContainer> -->
       <MapContainer v-show="view == 'map'"></MapContainer>
-      <PartnerInsContainer v-if="view == 'ptins'"></PartnerInsContainer>
+
+      <!-- <PartnerInsContainer v-if="view == 'ptins'"></PartnerInsContainer> -->
+      <SummaryTable v-if="view == 'ptins'"></SummaryTable>
+
       <DashboardView
         v-if="view == 'dashboard' && chartDataLoaded"
         :key="chartDataLoaded"
@@ -41,6 +44,7 @@ import MapContainer from "./components/MapContainer.vue";
 import PartnerInsContainer from "./components/PartnerInsContainer.vue";
 import DashboardView from "./components/DashboardView.vue";
 import DashboardViewSec from "./components/DashboardViewSec.vue";
+import SummaryTable from "./components/SummaryTable.vue";
 // import MapContainerLga from "./components/MapContainerLga.vue";
 // import TestMap from "./components/TestMap.vue";
 
