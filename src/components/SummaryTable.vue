@@ -83,8 +83,6 @@ import { useMainStore } from "./../storage/store";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import moment from "moment";
-import Vue3Datatable from "@bhplugin/vue3-datatable";
-import "@bhplugin/vue3-datatable/dist/style.css";
 
 const store = useMainStore();
 const {
