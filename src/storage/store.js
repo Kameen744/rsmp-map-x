@@ -1861,7 +1861,7 @@ export const useMainStore = defineStore("useMainStore", {
           stIdx++
         ) {
           const mpData = this.mapNationalData[this.view][stIdx];
-          if (mpData.Level_of_support == "National") {
+          if (mpData.Level_of_support.includes("National")) {
             this.nationalMapDataToShow.push(mpData);
           }
           this.addThematicAreas(mpData.Thematic_areas_supported);
