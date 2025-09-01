@@ -92,12 +92,13 @@ const supportTypes = [
 
 const campaignFocus = {
   categories: [
-    "Measles Rubella",
-    "Polio",
+    "HCE",
     "HPV",
-    "NTDs",
     "Malaria",
+    "Measles Rubella",
+    "NTDs",
     "Nutrition",
+    "Polio",
     "Routine Immunization",
   ],
   values: [4, 18, 36, 10, 24, 20, 22],

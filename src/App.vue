@@ -19,7 +19,6 @@ import Loading from "vue-loading-overlay";
 import { useMainStore } from "./storage/store";
 import { storeToRefs } from "pinia";
 const store = useMainStore();
-
 const { isLaoding } = storeToRefs(store);
 </script>
 

@@ -799,6 +799,7 @@ export const useMainStore = defineStore("useMainStore", {
 
     async fetchPrograms() {
       this.programAreas = [
+        { service: "HCE" },
         { service: "Measles Rubella" },
         { service: "Polio" },
         { service: "HPV" },
