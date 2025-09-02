@@ -103,7 +103,8 @@
         <div>
           <h2 class="text-xl font-semibold mb-2">Summary of Support</h2>
           <p class="text-gray-700">
-            {{ limtString(selectedMarker.Summary_of_Support, 300) }}
+            <!-- {{ limtString(selectedMarker.Summary_of_Support, 300) }} -->
+              {{ selectedMarker.Summary_of_Support }}
           </p>
         </div>
 
@@ -133,15 +134,37 @@
           </div>
         </div>
 
-        <div>
+        <div class="">
           <h2 class="text-xl font-semibold mb-2">LGA's Supported</h2>
           <div class="flex flex-wrap gap-2">
-            <span
-              v-for="lga in selectedMarker.LGA_supported"
-              class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded"
-              >{{ lga.lga }}</span
-            >
+            <template v-for="(lga, index) in selectedMarker.LGA_supported">
+
+              <div class=" w-full bg-slate-50" v-if="index === 0 || lga.state !== selectedMarker.LGA_supported[index - 1].state">
+                <strong>{{ lga.state }}</strong>
+              </div>
+
+              <div v-else class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded">
+                {{ lga.lga }}
+              </div>
+            </template>
+            
           </div>
+
+          <!-- <div class="" v-for="(lga, index) in selectedMarker.LGA_supported">
+          
+            <h3 
+              v-if="index === 0 || lga.state !== selectedMarker.LGA_supported[index - 1].state" 
+              class="font-semibold text-gray-700 mb-1 block bg-slate-50 text-center"
+            >
+              {{ lga.state }}
+            </h3>
+
+            <span 
+              class="text-sm bg-green-100 text-green-700 px-2 rounded"
+            >
+              {{ lga.lga }}
+            </span>
+          </div> -->
         </div>
 
         <!-- Thematic Areas -->
