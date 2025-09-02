@@ -135,13 +135,19 @@
         </div>
 
         <div class="">
+          <!-- {{ selectedMarker.LGA_supported }} -->
           <h2 class="text-xl font-semibold mb-2">LGA's Supported</h2>
           <div class="flex flex-wrap gap-2">
             <template v-for="(lga, index) in selectedMarker.LGA_supported">
-
-              <div class=" w-full bg-slate-50" v-if="index === 0 || lga.state !== selectedMarker.LGA_supported[index - 1].state">
+              <template v-if="index === 0 || lga.state != selectedMarker.LGA_supported[index - 1].state">
+              <div class=" w-full bg-slate-50" v-if="lga.lga">
                 <strong>{{ lga.state }}</strong>
               </div>
+
+              <div v-else class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded">
+                {{ lga.lga }}
+              </div>
+              </template>
 
               <div v-else class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded">
                 {{ lga.lga }}
