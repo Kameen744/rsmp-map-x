@@ -137,8 +137,20 @@
         <div class="">
           <!-- {{ selectedMarker.LGA_supported }} -->
           <h2 class="text-xl font-semibold mb-2">LGA's Supported</h2>
-          <div class="flex flex-wrap gap-2">
-            <template v-for="(lga, index) in selectedMarker.LGA_supported">
+
+          <div v-for="(data, state) in arrangeMarkers(selectedMarker.LGA_supported)">
+              <h3 class="bg-slate-50 mt-3">
+                <strong>{{ state }}</strong>
+              </h3>
+              <div class="flex flex-wrap gap-2 mt-1">
+                <div class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded" v-for="lga in data">
+                  {{ lga.lga }}
+                </div>
+              </div>
+          </div>
+
+          <!-- <div class="flex flex-wrap gap-2">
+            <template v-for="(lga, index) in arrangeMarkers(selectedMarker.LGA_supported)">
               <template v-if="index === 0 || lga.state != selectedMarker.LGA_supported[index - 1].state">
               <div class=" w-full bg-slate-50" v-if="lga.lga">
                 <strong>{{ lga.state }}</strong>
@@ -152,9 +164,10 @@
               <div v-else class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded">
                 {{ lga.lga }}
               </div>
-            </template>
-            
-          </div>
+            </template> 
+          </div> -->
+
+          
 
           <!-- <div class="" v-for="(lga, index) in selectedMarker.LGA_supported">
           
@@ -287,10 +300,24 @@ const getSpBg = (spName) => {
   let sp = store.getValFromData(supportTypes.value, "name", spName);
   return sp.bg;
 };
+
+const arrangeMarkers = (data) => {
+  let arData = {}
+  data.forEach((d) => {
+    if(!arData[d.state]) {
+      arData[d.state] = []
+    }
+
+    arData[d.state].push(d);
+  });
+
+  return arData;
+}
 const { selectedMarker, selectedLgaMarker, supportTypes } = storeToRefs(store);
 // onMounted(() => {
 //   console.log(selectedMarker.value);
 // });
+
 </script>
 
 <style scoped>
